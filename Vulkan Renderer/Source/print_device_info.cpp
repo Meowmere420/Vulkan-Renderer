@@ -43,19 +43,53 @@ void printSinglePhysicalDeviceMemoryProperties(const VkPhysicalDevice physicalDe
     // Print memory properties if desired
 }
 
+void printSinglePhysicalDeviceQueueFamily(const VkQueueFamilyProperties queueFamilyProperties)
+{
+    std::cout << "Queue count                   " << queueFamilyProperties.queueCount<< '\n';
+    std::cout << "VK_QUEUE_GRAPHICS_BIT         " << ((queueFamilyProperties.queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0 ? "true" : "false") << '\n';
+    std::cout << "VK_QUEUE_COMPUTE_BIT          " << ((queueFamilyProperties.queueFlags & VK_QUEUE_COMPUTE_BIT) != 0 ? "true" : "false") << '\n';
+    std::cout << "VK_QUEUE_TRANSFER_BIT         " << ((queueFamilyProperties.queueFlags & VK_QUEUE_TRANSFER_BIT) != 0 ? "true" : "false") << '\n';
+    std::cout << "VK_QUEUE_SPARSE_BINDING_BIT   " << ((queueFamilyProperties.queueFlags & VK_QUEUE_SPARSE_BINDING_BIT) != 0 ? "true" : "false") << '\n';
+}
+
+void printPhysicalDeviceQueueFamilies(const VkPhysicalDevice physicalDevice)
+{
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
+
+    VkQueueFamilyProperties* queueFamilyProperties = new VkQueueFamilyProperties[queueFamilyCount];
+    vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilyProperties);
+
+    std::cout << "Queue families: " << queueFamilyCount << '\n';
+
+    std::cout << '\n';
+
+    for (uint32_t i = 0; i < queueFamilyCount; i++)
+    {
+        std::cout << "Queue family: " << i << '\n';
+        std::cout << "--------------------------------------------------" << '\n';
+
+        printSinglePhysicalDeviceQueueFamily(queueFamilyProperties[i]);
+
+        std::cout << '\n';
+    }
+
+    delete[] queueFamilyProperties;
+}
+
 void printSinglePhysicalDeviceInfo(const VkPhysicalDevice physicalDevice)
 {
     VkPhysicalDeviceProperties physicalDeviceProperties;
     vkGetPhysicalDeviceProperties(physicalDevice, &physicalDeviceProperties);
 
-    std::cout << "Device name            " << physicalDeviceProperties.deviceName << '\n';
-    std::cout << "Vulkan driver version  " << VK_VERSION_MAJOR(physicalDeviceProperties.apiVersion) << '.'
-                                           << VK_VERSION_MINOR(physicalDeviceProperties.apiVersion) << '.'
-                                           << VK_VERSION_PATCH(physicalDeviceProperties.apiVersion) << '\n';
-    std::cout << "Vendor ID              " << physicalDeviceProperties.vendorID << '\n';
-    std::cout << "Device ID              " << physicalDeviceProperties.deviceID << '\n';
+    std::cout << "Device name                   " << physicalDeviceProperties.deviceName << '\n';
+    std::cout << "Vulkan driver version         " << VK_VERSION_MAJOR(physicalDeviceProperties.apiVersion) << '.'
+                                                  << VK_VERSION_MINOR(physicalDeviceProperties.apiVersion) << '.'
+                                                  << VK_VERSION_PATCH(physicalDeviceProperties.apiVersion) << '\n';
+    std::cout << "Vendor ID                     " << physicalDeviceProperties.vendorID << '\n';
+    std::cout << "Device ID                     " << physicalDeviceProperties.deviceID << '\n';
 
-    std::cout << "Device Type            ";
+    std::cout << "Device Type                   ";
     
     switch (physicalDeviceProperties.deviceType)
     {
@@ -75,6 +109,8 @@ void printSinglePhysicalDeviceInfo(const VkPhysicalDevice physicalDevice)
         std::cout << "CPU" << '\n';
         break;
     }
+
+    std::cout << '\n';
 }
 
 void printPhysicalDeviceInfo(const VkInstance instance)
@@ -106,8 +142,7 @@ void printPhysicalDeviceInfo(const VkInstance instance)
         printSinglePhysicalDeviceInfo(physicalDevices[i]);
         printSinglePhysicalDeviceFeatures(physicalDevices[i]);
         printSinglePhysicalDeviceMemoryProperties(physicalDevices[i]);
-
-        std::cout << '\n';
+        printPhysicalDeviceQueueFamilies(physicalDevices[i]);
     }
 
     delete[] physicalDevices;
