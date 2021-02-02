@@ -1,4 +1,4 @@
-// Vulkan Renderer - main.cpp
+// Vulkan Renderer - vkassert.h
 //
 // Copyright (c) 2020 Meowmere
 //
@@ -19,19 +19,28 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include <iostream>
+#pragma once
+
+#ifndef _VKASSERT_H_
+#define _VKASSERT_H_
+
+#include <cstdlib>
 
 #pragma warning(disable: 26812)
-#include <vulkan/vulkan.hpp>
+#include <vulkan/vulkan.h>
 
-#include "graphics.h"
-#include "print_device_info.h"
+#ifdef _DEBUG
+#define CHECK_VKRESULT(x) \
+	if (x != VK_SUCCESS) \
+	{ \
+		__debugbreak(); \
+	}
+#else
+#define CHECK_VKRESULT(x) \
+	if (x != VK_SUCCESS) \
+	{ \
+		std::exit(-1); \
+	}
+#endif
 
-int main()
-{
-	Graphics graphics;
-
-	printPhysicalDeviceInfo(graphics.GetVkInstance());
-
-	std::cin.get();
-}
+#endif // !_VKASSERT_H_

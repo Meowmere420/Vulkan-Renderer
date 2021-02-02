@@ -1,4 +1,4 @@
-// Vulkan Renderer - main.cpp
+// Vulkan Renderer - graphics.h
 //
 // Copyright (c) 2020 Meowmere
 //
@@ -19,19 +19,24 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include <iostream>
+#pragma once
+
+#ifndef _GRAPHICS_H_
+#define _GRAPHICS_H_
 
 #pragma warning(disable: 26812)
-#include <vulkan/vulkan.hpp>
+#include "vulkan/vulkan.h"
 
-#include "graphics.h"
-#include "print_device_info.h"
-
-int main()
+class Graphics
 {
-	Graphics graphics;
+public:
+	Graphics();
 
-	printPhysicalDeviceInfo(graphics.GetVkInstance());
+	~Graphics();
 
-	std::cin.get();
-}
+	VkInstance GetVkInstance() const noexcept;
+private:
+	VkInstance _instance;
+};
+
+#endif // !_GRAPHICS_H_
