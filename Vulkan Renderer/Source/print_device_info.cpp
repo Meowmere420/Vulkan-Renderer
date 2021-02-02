@@ -27,6 +27,22 @@
 // I don't even understand why I have to disable this abomination, sometimes Visual Studio is just straight up retarded
 #pragma warning(disable: 6385)
 
+void printSinglePhysicalDeviceFeatures(const VkPhysicalDevice physicalDevice)
+{
+    VkPhysicalDeviceFeatures physicalDeviceFeatures;
+    vkGetPhysicalDeviceFeatures(physicalDevice, &physicalDeviceFeatures);
+
+    // Print features if desired
+}
+
+void printSinglePhysicalDeviceMemoryProperties(const VkPhysicalDevice physicalDevice)
+{
+    VkPhysicalDeviceMemoryProperties memoryProperties;
+    vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memoryProperties);
+
+    // Print memory properties if desired
+}
+
 void printSinglePhysicalDeviceInfo(const VkPhysicalDevice physicalDevice)
 {
     VkPhysicalDeviceProperties physicalDeviceProperties;
@@ -88,6 +104,8 @@ void printPhysicalDeviceInfo(const VkInstance instance)
         std::cout << "--------------------------------------------------" << '\n';
 
         printSinglePhysicalDeviceInfo(physicalDevices[i]);
+        printSinglePhysicalDeviceFeatures(physicalDevices[i]);
+        printSinglePhysicalDeviceMemoryProperties(physicalDevices[i]);
 
         std::cout << '\n';
     }

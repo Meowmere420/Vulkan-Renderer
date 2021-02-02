@@ -19,11 +19,6 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include <iostream>
-
-#pragma warning(disable: 26812)
-#include <vulkan/vulkan.hpp>
-
 #include "graphics.h"
 #include "print_device_info.h"
 

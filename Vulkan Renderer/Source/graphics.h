@@ -24,6 +24,7 @@
 #ifndef _GRAPHICS_H_
 #define _GRAPHICS_H_
 
+// I fucking despise this warning
 #pragma warning(disable: 26812)
 #include "vulkan/vulkan.h"
 
