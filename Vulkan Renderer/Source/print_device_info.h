@@ -35,4 +35,6 @@ void printDeviceQueueFamilyProperties(const VkQueueFamilyProperties* deviceQueue
 
 void printLayerProperties(const VkLayerProperties* instanceLayers, const uint32_t layerPropertyCount);
 
+void printExtensionProperties(const VkExtensionProperties* extensions, const uint32_t extensionCount);
+
 #endif // !_PRINT_DEVICE_INFO_H_

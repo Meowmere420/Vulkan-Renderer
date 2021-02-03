@@ -47,10 +47,19 @@ Graphics::Graphics()
     CHECK_VKRESULT(result);
 
     std::vector<const char*> enabledLayerNames;
-
     #ifdef _DEBUG
     enabledLayerNames.push_back("VK_LAYER_KHRONOS_validation");
     #endif
+
+    std::vector<const char*> enabledExtensionNames;
+
+    uint32_t extensionPropertyCount = 0;
+    result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionPropertyCount, nullptr);
+    CHECK_VKRESULT(result);
+
+    VkExtensionProperties* instanceExtensions = new VkExtensionProperties[extensionPropertyCount];
+    result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionPropertyCount, instanceExtensions);
+    CHECK_VKRESULT(result);
 
     VkInstanceCreateInfo instanceCreateInfo;
     instanceCreateInfo.sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
@@ -59,8 +68,8 @@ Graphics::Graphics()
     instanceCreateInfo.pApplicationInfo        = &applicationInfo;
     instanceCreateInfo.enabledLayerCount       = uint32_t(enabledLayerNames.size());
     instanceCreateInfo.ppEnabledLayerNames     = enabledLayerNames.data();
-    instanceCreateInfo.enabledExtensionCount   = 0;
-    instanceCreateInfo.ppEnabledExtensionNames = nullptr;
+    instanceCreateInfo.enabledExtensionCount   = uint32_t(enabledExtensionNames.size());
+    instanceCreateInfo.ppEnabledExtensionNames = enabledExtensionNames.data();
 
     result = vkCreateInstance(&instanceCreateInfo, nullptr, &_instance);
     CHECK_VKRESULT(result);
@@ -95,7 +104,7 @@ Graphics::Graphics()
     deviceCreateInfo.sType                     = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     deviceCreateInfo.pNext                     = nullptr;
     deviceCreateInfo.flags                     = 0;
-    deviceCreateInfo.queueCreateInfoCount      = 1;
+    deviceCreateInfo.queueCreateInfoCount      = 1; // To-Do: Enable optimal amount of queues
     deviceCreateInfo.pQueueCreateInfos         = &deviceQueueCreateInfo;
     deviceCreateInfo.enabledLayerCount         = 0;
     deviceCreateInfo.ppEnabledLayerNames       = nullptr;
@@ -109,9 +118,12 @@ Graphics::Graphics()
     printPhysicalDeviceInfo(physicalDevices, physicalDeviceCount);
     printDeviceQueueFamilyProperties(queueFamilyProperties, queueFamilyCount);
     printLayerProperties(instanceLayers, layerPropertyCount);
+    printExtensionProperties(instanceExtensions, extensionPropertyCount);
 
     delete[] physicalDevices;
     delete[] queueFamilyProperties;
+    delete[] instanceLayers;
+    delete[] instanceExtensions;
 }
 
 Graphics::~Graphics()

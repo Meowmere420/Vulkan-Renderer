@@ -143,7 +143,7 @@ void printSingleLayerProperty(const VkLayerProperties& instanceLayer)
 void printLayerProperties(const VkLayerProperties* instanceLayers, const uint32_t layerPropertyCount)
 {
     std::cout << "==================================================" << '\n';
-    std::cout << "Vulkan layer properties" << '\n';
+    std::cout << "Vulkan layers" << '\n';
     std::cout << "==================================================" << '\n';
 
     std::cout << '\n';
@@ -158,6 +158,37 @@ void printLayerProperties(const VkLayerProperties* instanceLayers, const uint32_
         std::cout << "--------------------------------------------------" << '\n';
 
         printSingleLayerProperty(instanceLayers[i]);
+    }
+
+    std::cout << std::endl;
+}
+
+void printSingleExtensionProperty(const VkExtensionProperties& extension)
+{
+    std::cout << "Name                          " << extension.extensionName << '\n';
+    std::cout << "Specification version         " << extension.specVersion << '\n';
+
+    std::cout << '\n';
+}
+
+void printExtensionProperties(const VkExtensionProperties* extensions, const uint32_t extensionCount)
+{
+    std::cout << "==================================================" << '\n';
+    std::cout << "Vulkan extensions" << '\n';
+    std::cout << "==================================================" << '\n';
+
+    std::cout << '\n';
+
+    std::cout << "Extensions: " << extensionCount << '\n';
+
+    std::cout << '\n';
+
+    for (uint32_t i = 0; i < extensionCount; i++)
+    {
+        std::cout << "Vulkan extension: " << i << '\n';
+        std::cout << "--------------------------------------------------" << '\n';
+
+        printSingleExtensionProperty(extensions[i]);
     }
 
     std::cout << std::endl;
