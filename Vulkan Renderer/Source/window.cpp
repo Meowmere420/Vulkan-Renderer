@@ -1,4 +1,4 @@
-// Vulkan Renderer - main.cpp
+// Vulkan Renderer - window.cpp
 //
 // Copyright (c) 2020 Meowmere
 //
@@ -19,25 +19,24 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#define VK_USE_PLATFORM_WIN32_KHR
-#include <vulkan/vulkan.hpp>
-
-#define GLFW_INCLUDE_VULKAN
-#include <glfw/glfw3.h>
-
-#include "graphics.h"
-#include "print_device_info.h"
 #include "window.h"
 
-int main()
+#pragma comment(lib, "glfw/glfw3.lib")
+
+Window::Window(uint32_t width, uint32_t height, const std::string_view& name)
 {
-	glfwInit();
+	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
+	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
 
-	Graphics graphics;
-	Window window(800, 600, "Vulkan Application Window");
+	_window = glfwCreateWindow(width, height, name.data(), nullptr, nullptr);
+}
 
-	while (!window.shouldClose())
-	{
-		glfwPollEvents();
-	}
+Window::~Window()
+{
+	glfwDestroyWindow(_window);
+}
+
+bool Window::shouldClose() const noexcept
+{
+	return glfwWindowShouldClose(_window);
 }

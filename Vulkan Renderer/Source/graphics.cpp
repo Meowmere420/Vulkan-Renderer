@@ -52,6 +52,8 @@ Graphics::Graphics()
     #endif
 
     std::vector<const char*> enabledExtensionNames;
+    enabledExtensionNames.push_back("VK_KHR_surface");
+    enabledExtensionNames.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
 
     uint32_t extensionPropertyCount = 0;
     result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionPropertyCount, nullptr);
@@ -115,6 +117,9 @@ Graphics::Graphics()
     result = vkCreateDevice(physicalDevices[0], &deviceCreateInfo, nullptr, &_device);
     CHECK_VKRESULT(result);
 
+    VkQueue queue;
+    vkGetDeviceQueue(_device, 0, 0, &queue);
+
     printPhysicalDeviceInfo(physicalDevices, physicalDeviceCount);
     printDeviceQueueFamilyProperties(queueFamilyProperties, queueFamilyCount);
     printLayerProperties(instanceLayers, layerPropertyCount);
@@ -128,6 +133,7 @@ Graphics::Graphics()
 
 Graphics::~Graphics()
 {
+    vkDestroyDevice(_device, nullptr);
     vkDestroyInstance(_instance, nullptr);
 }
 
