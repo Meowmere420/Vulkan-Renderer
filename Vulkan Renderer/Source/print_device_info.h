@@ -29,6 +29,6 @@
 #pragma warning(disable: 26812)
 #include <vulkan/vulkan.h>
 
-void printPhysicalDeviceInfo(const VkInstance instance);
+void printPhysicalDeviceInfo(const VkPhysicalDevice* physicalDevices, const uint32_t physicalDeviceCount);
 
 #endif // !_PRINT_DEVICE_INFO_H_

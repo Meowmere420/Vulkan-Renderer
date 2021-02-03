@@ -113,16 +113,8 @@ void printSinglePhysicalDeviceInfo(const VkPhysicalDevice physicalDevice)
     std::cout << '\n';
 }
 
-void printPhysicalDeviceInfo(const VkInstance instance)
+void printPhysicalDeviceInfo(const VkPhysicalDevice* physicalDevices, const uint32_t physicalDeviceCount)
 {
-    uint32_t physicalDeviceCount = 0;
-    VkResult result = vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, nullptr);
-    CHECK_VKRESULT(result);
-
-    VkPhysicalDevice* physicalDevices = new VkPhysicalDevice[physicalDeviceCount];
-    result = vkEnumeratePhysicalDevices(instance, &physicalDeviceCount, physicalDevices);
-    CHECK_VKRESULT(result);
-
     std::cout << "==================================================" << '\n';
     std::cout << "Physical device properties" << '\n';
     std::cout << "==================================================" << '\n';
@@ -130,7 +122,7 @@ void printPhysicalDeviceInfo(const VkInstance instance)
     std::cout << '\n';
 
     std::cout << "Physical devices: " << physicalDeviceCount << '\n';
-    
+
     std::cout << '\n';
 
     for (uint32_t i = 0; i < physicalDeviceCount; ++i)
@@ -144,6 +136,4 @@ void printPhysicalDeviceInfo(const VkInstance instance)
         printSinglePhysicalDeviceMemoryProperties(physicalDevices[i]);
         printPhysicalDeviceQueueFamilies(physicalDevices[i]);
     }
-
-    delete[] physicalDevices;
 }

@@ -31,13 +31,16 @@
 class Graphics
 {
 public:
-	Graphics();
+    Graphics();
 
-	~Graphics();
+    ~Graphics();
 
-	VkInstance GetVkInstance() const noexcept;
+    VkInstance GetVkInstance() const noexcept;
+
+    VkDevice GetVkDevice() const noexcept;
 private:
-	VkInstance _instance;
+    VkInstance _instance;
+    VkDevice   _device;
 };
 
 #endif // !_GRAPHICS_H_

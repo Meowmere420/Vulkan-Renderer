@@ -26,7 +26,5 @@ int main()
 {
 	Graphics graphics;
 
-	printPhysicalDeviceInfo(graphics.GetVkInstance());
-
 	std::cin.get();
 }

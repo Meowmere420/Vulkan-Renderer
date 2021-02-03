@@ -47,6 +47,41 @@ Graphics::Graphics()
 
     VkResult result = vkCreateInstance(&instanceCreateInfo, nullptr, &_instance);
     CHECK_VKRESULT(result);
+
+    uint32_t physicalDeviceCount = 0;
+    result = vkEnumeratePhysicalDevices(_instance, &physicalDeviceCount, nullptr);
+    CHECK_VKRESULT(result);
+
+    VkPhysicalDevice* physicalDevices = new VkPhysicalDevice[physicalDeviceCount];
+    result = vkEnumeratePhysicalDevices(_instance, &physicalDeviceCount, physicalDevices);
+    CHECK_VKRESULT(result);
+
+    VkDeviceQueueCreateInfo deviceQueueCreateInfo;
+    deviceQueueCreateInfo.sType                = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
+    deviceQueueCreateInfo.pNext                = nullptr;
+    deviceQueueCreateInfo.flags                = 0;
+    deviceQueueCreateInfo.queueFamilyIndex     = 0; // To-Do: Choose optimal queue
+    deviceQueueCreateInfo.queueCount           = 4; // To-Do: Verify queue count
+    deviceQueueCreateInfo.pQueuePriorities     = nullptr;
+
+    VkPhysicalDeviceFeatures enabledDeviceFeatures = {};
+
+    VkDeviceCreateInfo deviceCreateInfo;
+    deviceCreateInfo.sType                     = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+    deviceCreateInfo.pNext                     = nullptr;
+    deviceCreateInfo.flags                     = 0;
+    deviceCreateInfo.queueCreateInfoCount      = 1;
+    deviceCreateInfo.pQueueCreateInfos         = &deviceQueueCreateInfo;
+    deviceCreateInfo.enabledLayerCount         = 0;
+    deviceCreateInfo.ppEnabledLayerNames       = nullptr;
+    deviceCreateInfo.enabledExtensionCount     = 0;
+    deviceCreateInfo.ppEnabledExtensionNames   = nullptr;
+    deviceCreateInfo.pEnabledFeatures          = &enabledDeviceFeatures;
+
+    result = vkCreateDevice(physicalDevices[0], &deviceCreateInfo, nullptr, &_device);
+    CHECK_VKRESULT(result);
+
+    delete[] physicalDevices;
 }
 
 Graphics::~Graphics()
@@ -57,4 +92,9 @@ Graphics::~Graphics()
 VkInstance Graphics::GetVkInstance() const noexcept
 {
     return _instance;
+}
+
+VkDevice Graphics::GetVkDevice() const noexcept
+{
+    return _device;
 }
