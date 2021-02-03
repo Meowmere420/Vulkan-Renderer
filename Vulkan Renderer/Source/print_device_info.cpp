@@ -43,40 +43,6 @@ void printSinglePhysicalDeviceMemoryProperties(const VkPhysicalDevice physicalDe
     // Print memory properties if desired
 }
 
-void printSinglePhysicalDeviceQueueFamily(const VkQueueFamilyProperties queueFamilyProperties)
-{
-    std::cout << "Queue count                   " << queueFamilyProperties.queueCount<< '\n';
-    std::cout << "VK_QUEUE_GRAPHICS_BIT         " << ((queueFamilyProperties.queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0 ? "true" : "false") << '\n';
-    std::cout << "VK_QUEUE_COMPUTE_BIT          " << ((queueFamilyProperties.queueFlags & VK_QUEUE_COMPUTE_BIT) != 0 ? "true" : "false") << '\n';
-    std::cout << "VK_QUEUE_TRANSFER_BIT         " << ((queueFamilyProperties.queueFlags & VK_QUEUE_TRANSFER_BIT) != 0 ? "true" : "false") << '\n';
-    std::cout << "VK_QUEUE_SPARSE_BINDING_BIT   " << ((queueFamilyProperties.queueFlags & VK_QUEUE_SPARSE_BINDING_BIT) != 0 ? "true" : "false") << '\n';
-}
-
-void printPhysicalDeviceQueueFamilies(const VkPhysicalDevice physicalDevice)
-{
-    uint32_t queueFamilyCount = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, nullptr);
-
-    VkQueueFamilyProperties* queueFamilyProperties = new VkQueueFamilyProperties[queueFamilyCount];
-    vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilyProperties);
-
-    std::cout << "Queue families: " << queueFamilyCount << '\n';
-
-    std::cout << '\n';
-
-    for (uint32_t i = 0; i < queueFamilyCount; i++)
-    {
-        std::cout << "Queue family: " << i << '\n';
-        std::cout << "--------------------------------------------------" << '\n';
-
-        printSinglePhysicalDeviceQueueFamily(queueFamilyProperties[i]);
-
-        std::cout << '\n';
-    }
-
-    delete[] queueFamilyProperties;
-}
-
 void printSinglePhysicalDeviceInfo(const VkPhysicalDevice physicalDevice)
 {
     VkPhysicalDeviceProperties physicalDeviceProperties;
@@ -134,6 +100,65 @@ void printPhysicalDeviceInfo(const VkPhysicalDevice* physicalDevices, const uint
         printSinglePhysicalDeviceInfo(physicalDevices[i]);
         printSinglePhysicalDeviceFeatures(physicalDevices[i]);
         printSinglePhysicalDeviceMemoryProperties(physicalDevices[i]);
-        printPhysicalDeviceQueueFamilies(physicalDevices[i]);
     }
+
+    std::cout << std::endl;
+}
+
+void printSinglePhysicalDeviceQueueFamily(const VkQueueFamilyProperties queueFamilyProperties)
+{
+    std::cout << "Queue count                   " << queueFamilyProperties.queueCount << '\n';
+    std::cout << "VK_QUEUE_GRAPHICS_BIT         " << ((queueFamilyProperties.queueFlags & VK_QUEUE_GRAPHICS_BIT) != 0 ? "true" : "false") << '\n';
+    std::cout << "VK_QUEUE_COMPUTE_BIT          " << ((queueFamilyProperties.queueFlags & VK_QUEUE_COMPUTE_BIT) != 0 ? "true" : "false") << '\n';
+    std::cout << "VK_QUEUE_TRANSFER_BIT         " << ((queueFamilyProperties.queueFlags & VK_QUEUE_TRANSFER_BIT) != 0 ? "true" : "false") << '\n';
+    std::cout << "VK_QUEUE_SPARSE_BINDING_BIT   " << ((queueFamilyProperties.queueFlags & VK_QUEUE_SPARSE_BINDING_BIT) != 0 ? "true" : "false") << '\n';
+}
+
+void printDeviceQueueFamilyProperties(const VkQueueFamilyProperties* deviceQueueFamilies, const uint32_t queueFamilyCount)
+{
+    std::cout << "Queue families: " << queueFamilyCount << '\n';
+
+    std::cout << '\n';
+
+    for (uint32_t i = 0; i < queueFamilyCount; i++)
+    {
+        std::cout << "Queue family: " << i << '\n';
+        std::cout << "--------------------------------------------------" << '\n';
+
+        printSinglePhysicalDeviceQueueFamily(deviceQueueFamilies[i]);
+
+        std::cout << '\n';
+    }
+}
+
+void printSingleLayerProperty(const VkLayerProperties& instanceLayer)
+{
+    std::cout << "Name                          " << instanceLayer.layerName << '\n';
+    std::cout << "Specification version         " << instanceLayer.specVersion << '\n';
+    std::cout << "Implementation version        " << instanceLayer.implementationVersion << '\n';
+
+    std::cout << '\n';
+}
+
+void printLayerProperties(const VkLayerProperties* instanceLayers, const uint32_t layerPropertyCount)
+{
+    std::cout << "==================================================" << '\n';
+    std::cout << "Vulkan layer properties" << '\n';
+    std::cout << "==================================================" << '\n';
+
+    std::cout << '\n';
+
+    std::cout << "Layers: " << layerPropertyCount << '\n';
+
+    std::cout << '\n';
+
+    for (uint32_t i = 0; i < layerPropertyCount; i++)
+    {
+        std::cout << "Vulkan layer: " << i << '\n';
+        std::cout << "--------------------------------------------------" << '\n';
+
+        printSingleLayerProperty(instanceLayers[i]);
+    }
+
+    std::cout << std::endl;
 }

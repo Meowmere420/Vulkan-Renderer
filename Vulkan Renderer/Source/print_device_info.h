@@ -31,4 +31,8 @@
 
 void printPhysicalDeviceInfo(const VkPhysicalDevice* physicalDevices, const uint32_t physicalDeviceCount);
 
+void printDeviceQueueFamilyProperties(const VkQueueFamilyProperties* deviceQueueFamilies, const uint32_t queueFamilyCount);
+
+void printLayerProperties(const VkLayerProperties* instanceLayers, const uint32_t layerPropertyCount);
+
 #endif // !_PRINT_DEVICE_INFO_H_

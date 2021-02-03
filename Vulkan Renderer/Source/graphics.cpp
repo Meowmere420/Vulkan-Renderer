@@ -19,7 +19,10 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "Graphics.h"
+#include <vector>
+
+#include "graphics.h"
+#include "print_device_info.h"
 #include "vkassert.h"
 
 #pragma comment(lib, "vulkan-1.lib")
@@ -33,19 +36,33 @@ Graphics::Graphics()
     applicationInfo.applicationVersion         = VK_MAKE_VERSION(0, 0, 0);
     applicationInfo.pEngineName                = "Vulkan Renderer";
     applicationInfo.engineVersion              = VK_MAKE_VERSION(0, 0, 0);
-    applicationInfo.apiVersion                 = VK_VERSION_1_2;
+    applicationInfo.apiVersion                 = VK_API_VERSION_1_2;
+
+    uint32_t layerPropertyCount = 0;
+    VkResult result = vkEnumerateInstanceLayerProperties(&layerPropertyCount, nullptr);
+    CHECK_VKRESULT(result);
+
+    VkLayerProperties* instanceLayers = new VkLayerProperties[layerPropertyCount];
+    result = vkEnumerateInstanceLayerProperties(&layerPropertyCount, instanceLayers);
+    CHECK_VKRESULT(result);
+
+    std::vector<const char*> enabledLayerNames;
+
+    #ifdef _DEBUG
+    enabledLayerNames.push_back("VK_LAYER_KHRONOS_validation");
+    #endif
 
     VkInstanceCreateInfo instanceCreateInfo;
     instanceCreateInfo.sType                   = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
     instanceCreateInfo.pNext                   = nullptr;
     instanceCreateInfo.flags                   = 0;
     instanceCreateInfo.pApplicationInfo        = &applicationInfo;
-    instanceCreateInfo.enabledLayerCount       = 0;
-    instanceCreateInfo.ppEnabledLayerNames     = nullptr;
+    instanceCreateInfo.enabledLayerCount       = uint32_t(enabledLayerNames.size());
+    instanceCreateInfo.ppEnabledLayerNames     = enabledLayerNames.data();
     instanceCreateInfo.enabledExtensionCount   = 0;
     instanceCreateInfo.ppEnabledExtensionNames = nullptr;
 
-    VkResult result = vkCreateInstance(&instanceCreateInfo, nullptr, &_instance);
+    result = vkCreateInstance(&instanceCreateInfo, nullptr, &_instance);
     CHECK_VKRESULT(result);
 
     uint32_t physicalDeviceCount = 0;
@@ -56,13 +73,21 @@ Graphics::Graphics()
     result = vkEnumeratePhysicalDevices(_instance, &physicalDeviceCount, physicalDevices);
     CHECK_VKRESULT(result);
 
+    uint32_t queueFamilyCount = 0;
+    vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &queueFamilyCount, nullptr); // To-Do: Print device queue properties for all devices
+
+    VkQueueFamilyProperties* queueFamilyProperties = new VkQueueFamilyProperties[queueFamilyCount];
+    vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &queueFamilyCount, queueFamilyProperties);
+
+    float queuePriorities[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
+
     VkDeviceQueueCreateInfo deviceQueueCreateInfo;
     deviceQueueCreateInfo.sType                = VK_STRUCTURE_TYPE_DEVICE_QUEUE_CREATE_INFO;
     deviceQueueCreateInfo.pNext                = nullptr;
     deviceQueueCreateInfo.flags                = 0;
     deviceQueueCreateInfo.queueFamilyIndex     = 0; // To-Do: Choose optimal queue
     deviceQueueCreateInfo.queueCount           = 4; // To-Do: Verify queue count
-    deviceQueueCreateInfo.pQueuePriorities     = nullptr;
+    deviceQueueCreateInfo.pQueuePriorities     = queuePriorities;
 
     VkPhysicalDeviceFeatures enabledDeviceFeatures = {};
 
@@ -81,7 +106,12 @@ Graphics::Graphics()
     result = vkCreateDevice(physicalDevices[0], &deviceCreateInfo, nullptr, &_device);
     CHECK_VKRESULT(result);
 
+    printPhysicalDeviceInfo(physicalDevices, physicalDeviceCount);
+    printDeviceQueueFamilyProperties(queueFamilyProperties, queueFamilyCount);
+    printLayerProperties(instanceLayers, layerPropertyCount);
+
     delete[] physicalDevices;
+    delete[] queueFamilyProperties;
 }
 
 Graphics::~Graphics()
