@@ -159,17 +159,15 @@
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\print_device_info.cpp" />
     <ClCompile Include="Source\surface.cpp" />
+    <ClCompile Include="Source\win32_window.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\graphics.h" />
     <ClInclude Include="Source\print_device_info.h" />
     <ClInclude Include="Source\surface.h" />
     <ClInclude Include="Source\vkassert.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Window Library\Window Library.vcxproj">
-      <Project>{70c7cff5-d309-4a5b-89b8-fdfee2946ee5}</Project>
-    </ProjectReference>
+    <ClInclude Include="Source\windefines.h" />
+    <ClInclude Include="Source\window.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
