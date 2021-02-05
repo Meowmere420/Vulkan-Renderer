@@ -26,8 +26,7 @@
 
 #include <iostream>
 
-#pragma warning(disable: 26812)
-#include <vulkan/vulkan.h>
+#include "vkdefines.h"
 
 void printPhysicalDeviceInfo(const VkPhysicalDevice* physicalDevices, const uint32_t physicalDeviceCount);
 

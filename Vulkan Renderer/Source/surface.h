@@ -24,9 +24,7 @@
 #ifndef _SURFACE_H_
 #define _SURFACE_H_
 
-#define VK_USE_PLATFORM_WIN32_KHR
-#include <vulkan/vulkan.h>
-
+#include "vkdefines.h"
 #include "windefines.h"
 
 class Window;

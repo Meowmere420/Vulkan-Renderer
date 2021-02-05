@@ -38,9 +38,6 @@
     <ClInclude Include="Source\graphics.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="Source\vkassert.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="Source\windefines.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
@@ -48,6 +45,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="Source\surface.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\vkdefines.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

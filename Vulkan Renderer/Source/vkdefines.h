@@ -26,8 +26,11 @@
 
 #include <cstdlib>
 
+// I fucking despise this warning, why is this shit enabled on /W3?
 #pragma warning(disable: 26812)
-#include <vulkan/vulkan.h>
+
+#define VK_USE_PLATFORM_WIN32_KHR
+#include <vulkan/vulkan.hpp>
 
 #ifdef _DEBUG
 #define CHECK_VKRESULT(x) \

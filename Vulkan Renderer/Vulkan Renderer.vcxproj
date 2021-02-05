@@ -165,7 +165,7 @@
     <ClInclude Include="Source\graphics.h" />
     <ClInclude Include="Source\print_device_info.h" />
     <ClInclude Include="Source\surface.h" />
-    <ClInclude Include="Source\vkassert.h" />
+    <ClInclude Include="Source\vkdefines.h" />
     <ClInclude Include="Source\windefines.h" />
     <ClInclude Include="Source\window.h" />
   </ItemGroup>
