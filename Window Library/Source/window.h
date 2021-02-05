@@ -36,6 +36,9 @@ typedef HWND WindowHandle;
 #elif defined(__linux__)
 #error Linux is currently not supported
 
+#else
+#error Unsupported operating system
+
 #endif
 
 #include <stdint.h>

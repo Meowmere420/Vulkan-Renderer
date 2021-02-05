@@ -30,7 +30,7 @@ public:
         ZeroMemory(&wndClass, sizeof(WNDCLASSEX));
         wndClass.cbSize        = sizeof(WNDCLASSEX);
         wndClass.style         = CS_OWNDC;
-        //wndClass.lpfnWndProc   = window proc;
+        wndClass.lpfnWndProc   = DefWindowProc;
         wndClass.cbClsExtra    = 0;
         wndClass.cbWndExtra    = 0;
         wndClass.hInstance     = _instance;
@@ -90,6 +90,8 @@ Window::Window(uint32_t clientWidth, uint32_t clientHeight, uint32_t posX, uint3
     {
         __debugbreak();
     }
+
+    ShowWindow(_handle, SW_SHOWDEFAULT);
 }
 
 Window::~Window()

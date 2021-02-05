@@ -22,10 +22,22 @@
 #define VK_USE_PLATFORM_WIN32_KHR
 #include <vulkan/vulkan.hpp>
 
+#include <chrono>
+#include <thread>
+
 #include "graphics.h"
 #include "print_device_info.h"
+
+#include "window.h"
 
 int main()
 {
 	Graphics graphics;
+
+	Window window(800, 600, 0, 0, L"Window");
+
+	while (true)
+	{
+		std::this_thread::sleep_for(std::chrono::milliseconds(1));
+	}
 }

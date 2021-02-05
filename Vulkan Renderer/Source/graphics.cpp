@@ -25,9 +25,6 @@
 #include "print_device_info.h"
 #include "vkassert.h"
 
-#define GLFW_INCLUDE_VULKAN
-#include <glfw/glfw3.h>
-
 #pragma comment(lib, "vulkan-1.lib")
 
 Graphics::Graphics()
@@ -78,11 +75,6 @@ Graphics::Graphics()
 
     result = vkCreateInstance(&instanceCreateInfo, nullptr, &_instance);
     CHECK_VKRESULT(result);
-
-    GLFWwindow* window = nullptr;
-
-    VkSurfaceKHR surface;
-    result = glfwCreateWindowSurface(_instance, window, nullptr, &surface);
 
     uint32_t physicalDeviceCount = 0;
     result = vkEnumeratePhysicalDevices(_instance, &physicalDeviceCount, nullptr);
