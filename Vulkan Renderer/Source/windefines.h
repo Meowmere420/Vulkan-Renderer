@@ -23,8 +23,6 @@
 #ifndef _WINDEFINES_H_
 #define _WINDEFINES_H_
 
-// Using Windows 10 as target platform
-#define _WIN32_WINNT _WIN32_WINNT_WIN10
 #include <sdkddkver.h>
 
 // Disable various unused Windows capabilities

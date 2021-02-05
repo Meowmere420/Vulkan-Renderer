@@ -29,6 +29,7 @@
 
 #include <memory>
 #include <string_view>
+#include <vector>
 
 #include "surface.h"
 
@@ -47,7 +48,7 @@ public:
 
     void swapBuffers() const;
 
-    void getVulkanExtensions(const char** extensionNames, uint32_t* extensionCount) const;
+    static std::vector<const char*> getVulkanExtensions();
 
     const Surface& getSurface() const noexcept;
 

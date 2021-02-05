@@ -24,6 +24,7 @@
 #include "graphics.h"
 #include "print_device_info.h"
 #include "vkassert.h"
+#include "window.h"
 
 #pragma comment(lib, "vulkan-1.lib")
 
@@ -53,9 +54,7 @@ Graphics::Graphics()
     enabledLayerNames.push_back("VK_LAYER_KHRONOS_validation");
     #endif
 
-    std::vector<const char*> enabledExtensionNames;
-    enabledExtensionNames.push_back("VK_KHR_surface");
-    enabledExtensionNames.push_back(VK_KHR_WIN32_SURFACE_EXTENSION_NAME);
+    std::vector<const char*> enabledExtensionNames = Window::getVulkanExtensions();
 
     uint32_t extensionPropertyCount = 0;
     result = vkEnumerateInstanceExtensionProperties(nullptr, &extensionPropertyCount, nullptr);

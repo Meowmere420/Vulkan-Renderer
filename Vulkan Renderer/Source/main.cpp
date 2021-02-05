@@ -24,6 +24,7 @@
 
 #include <chrono>
 #include <thread>
+#include <iostream>
 
 #include "graphics.h"
 #include "print_device_info.h"
@@ -34,8 +35,5 @@ int main()
 {
 	Window window(800, 600, 0, 0, L"Window");
 
-	while (true)
-	{
-		std::this_thread::sleep_for(std::chrono::milliseconds(1));
-	}
+	std::cin.get();
 }

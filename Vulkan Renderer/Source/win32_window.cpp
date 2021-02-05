@@ -124,12 +124,12 @@ void Window::swapBuffers() const
 {
 }
 
-void Window::getVulkanExtensions(const char** extensionNames, uint32_t* extensionCount) const
+std::vector<const char*> Window::getVulkanExtensions()
 {
-    *extensionCount = 2;
-    extensionNames = new const char* [*extensionCount];
-    extensionNames[0] = "VK_KHR_surface";
-    extensionNames[1] = "VK_KHR_win32_surface";
+    std::vector<const char*> extensions;
+    extensions.push_back("VK_KHR_surface");
+    extensions.push_back("VK_KHR_win32_surface");
+    return extensions;
 }
 
 const Surface& Window::getSurface() const noexcept
