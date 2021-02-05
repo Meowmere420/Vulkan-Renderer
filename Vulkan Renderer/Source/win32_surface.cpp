@@ -19,19 +19,27 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#include "graphics.h"
 #include "surface.h"
+#include "vkassert.h"
+#include "window.h"
 
-#include <glfw/glfw3.h>
-
-Surface::Surface()
+Surface::Surface(HWND windowHandle, HINSTANCE windowClass)
 {
-    
+    VkWin32SurfaceCreateInfoKHR surfaceCreateInfo;
+    surfaceCreateInfo.sType     = VK_STRUCTURE_TYPE_WIN32_SURFACE_CREATE_INFO_KHR;
+    surfaceCreateInfo.pNext     = nullptr;
+    surfaceCreateInfo.flags     = 0;
+    surfaceCreateInfo.hinstance = windowClass;
+    surfaceCreateInfo.hwnd      = windowHandle;
 
-
+    VkResult result = vkCreateWin32SurfaceKHR(Graphics::Get().getVkInstance(), &surfaceCreateInfo, nullptr, &_surface);
+    CHECK_VKRESULT(result);
 }
 
 Surface::~Surface()
 {
+    vkDestroySurfaceKHR(Graphics::Get().getVkInstance(), _surface, nullptr);
 }
 
 VkSurfaceKHR Surface::getSurface() const noexcept

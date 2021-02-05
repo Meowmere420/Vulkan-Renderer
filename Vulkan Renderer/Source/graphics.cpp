@@ -27,6 +27,8 @@
 
 #pragma comment(lib, "vulkan-1.lib")
 
+Graphics Graphics::_singleton;
+
 Graphics::Graphics()
 {
     VkApplicationInfo applicationInfo;
@@ -139,7 +141,12 @@ Graphics::~Graphics()
     vkDestroyInstance(_instance, nullptr);
 }
 
-VkInstance Graphics::GetVkInstance() const noexcept
+Graphics& Graphics::Get() noexcept
+{
+    return _singleton;
+}
+
+VkInstance Graphics::getVkInstance() const noexcept
 {
     return _instance;
 }

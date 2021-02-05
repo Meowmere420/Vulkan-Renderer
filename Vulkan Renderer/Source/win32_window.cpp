@@ -18,6 +18,7 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#include "surface.h"
 #include "window.h"
 
 class WindowClass
@@ -48,12 +49,12 @@ public:
         UnregisterClass(_name, _instance);
     }
 
-    constexpr const wchar_t* Name() noexcept
+    constexpr const wchar_t* getName() noexcept
     {
         return _name;
     }
 
-    HINSTANCE Instance() const noexcept
+    HINSTANCE getInstance() const noexcept
     {
         return _instance;
     }
@@ -72,7 +73,7 @@ Window::Window(uint32_t clientWidth, uint32_t clientHeight, uint32_t posX, uint3
     AdjustWindowRect(&clientSize, windowStyle, FALSE);
 
     _handle = CreateWindowW(
-        windowClass.Name(),
+        windowClass.getName(),
         title.data(),
         windowStyle,
         CW_USEDEFAULT,
@@ -81,7 +82,7 @@ Window::Window(uint32_t clientWidth, uint32_t clientHeight, uint32_t posX, uint3
         clientSize.bottom - clientSize.top,
         NULL,
         NULL,
-        windowClass.Instance(),
+        windowClass.getInstance(),
         this
     );
 
@@ -91,12 +92,15 @@ Window::Window(uint32_t clientWidth, uint32_t clientHeight, uint32_t posX, uint3
         __debugbreak();
     }
 
+    _surface = new Surface(_handle, windowClass.getInstance());
+
     ShowWindow(_handle, SW_SHOWDEFAULT);
 }
 
 Window::~Window()
 {
     DestroyWindow(_handle);
+    delete _surface;
 }
 
 void Window::resize(uint32_t clientWidth, uint32_t clientHeight)
@@ -128,9 +132,9 @@ void Window::getVulkanExtensions(const char** extensionNames, uint32_t* extensio
     extensionNames[1] = "VK_KHR_win32_surface";
 }
 
-WindowHandle Window::getHandle() const noexcept
+const Surface& Window::getSurface() const noexcept
 {
-    return _handle;
+    return *_surface;
 }
 
 uint32_t Window::getPosX() const noexcept

@@ -36,12 +36,15 @@ public:
 
     ~Graphics();
 
-    VkInstance GetVkInstance() const noexcept;
+    static Graphics& Get() noexcept;
+
+    VkInstance getVkInstance() const noexcept;
 
     VkDevice GetVkDevice() const noexcept;
 private:
-    VkInstance _instance;
-    VkDevice   _device;
+    static Graphics _singleton;
+    VkInstance      _instance;
+    VkDevice        _device;
 };
 
 #endif // !_GRAPHICS_H_

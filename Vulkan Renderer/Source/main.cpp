@@ -32,8 +32,6 @@
 
 int main()
 {
-	Graphics graphics;
-
 	Window window(800, 600, 0, 0, L"Window");
 
 	while (true)

@@ -23,26 +23,14 @@
 #ifndef _WINDOW_H_
 #define _WINDOW_H_
 
-#ifdef _WIN32
 #include "windefines.h"
-typedef HWND WindowHandle;
-
-#elif defined(__APPLE__)
-#error MacOS is currently not supported
-
-#elif defined(__ANDROID__)
-#error Android is currently not supported
-
-#elif defined(__linux__)
-#error Linux is currently not supported
-
-#else
-#error Unsupported operating system
-
-#endif
 
 #include <stdint.h>
+
+#include <memory>
 #include <string_view>
+
+#include "surface.h"
 
 class Window
 {
@@ -61,7 +49,7 @@ public:
 
     void getVulkanExtensions(const char** extensionNames, uint32_t* extensionCount) const;
 
-    WindowHandle getHandle() const noexcept;
+    const Surface& getSurface() const noexcept;
 
     uint32_t getPosX() const noexcept;
 
@@ -71,7 +59,9 @@ public:
 
     uint32_t getHeight() const noexcept;
 private:
-    WindowHandle _handle;
+    Surface*     _surface;
+    HWND         _handle;
+    HINSTANCE    _class;
     uint32_t     _posX;
     uint32_t     _posY;
     uint32_t     _clientWidth;
