@@ -1,4 +1,4 @@
-// Vulkan Renderer - window.cpp
+// Vulkan Renderer - surface.h
 //
 // Copyright (c) 2020 Meowmere
 //
@@ -19,24 +19,23 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "window.h"
+#pragma once
 
-#pragma comment(lib, "glfw/glfw3.lib")
+#ifndef _SURFACE_H_
+#define _SURFACE_H_
 
-Window::Window(uint32_t width, uint32_t height, const std::string_view& name)
+#include <vulkan/vulkan.h>
+
+class Surface
 {
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_FALSE);
+public:
+	Surface();
 
-	_window = glfwCreateWindow(width, height, name.data(), nullptr, nullptr);
-}
+	~Surface();
 
-Window::~Window()
-{
-	glfwDestroyWindow(_window);
-}
+	VkSurfaceKHR getSurface() const noexcept;
+private:
+	VkSurfaceKHR _surface;
+};
 
-bool Window::shouldClose() const noexcept
-{
-	return glfwWindowShouldClose(_window);
-}
+#endif // !_SURFACE_H_

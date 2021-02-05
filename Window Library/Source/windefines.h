@@ -1,5 +1,4 @@
-// Vulkan Renderer - main.cpp
-//
+// Vulkan Renderer -  windefines.h
 // Copyright (c) 2020 Meowmere
 //
 // https://github.com/Meowmere420/Vulkan-Renderer
@@ -19,13 +18,52 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#define VK_USE_PLATFORM_WIN32_KHR
-#include <vulkan/vulkan.hpp>
+#pragma once
 
-#include "graphics.h"
-#include "print_device_info.h"
+#ifndef _WINDEFINES_H_
+#define _WINDEFINES_H_
 
-int main()
-{
-	Graphics graphics;
-}
+// Using Windows 10 as target platform
+#define _WIN32_WINNT _WIN32_WINNT_WIN10
+#include <sdkddkver.h>
+
+// Disable various unused Windows capabilities
+#define WIN32_LEAN_AND_MEAN
+#define NOATOM
+#define NOCLIPBOARD
+#define NOCOLOR
+#define NOCOMM
+#define NOCRYPT
+#define NOCTLMGR
+#define NODEFERWINDOWPOS
+#define NODRAWTEXT
+#define NOGDICAPMASKS
+#define NOHELP
+#define NOICONS
+#define NOIMAGE
+#define NOKANJI
+#define NOKERNEL
+#define NOMCX
+#define NOMEMMGR
+#define NOMENUS
+#define NOMETAFILE
+#define NOMINMAX
+#define NONLS
+#define NOOPENFILE
+#define NOPROFILER
+#define NOPROXYSTUB
+#define NORASTEROPS
+#define NORPC
+#define NOSCROLL
+#define NOSERVICE
+#define NOSOUND
+#define NOSYSCOMMANDS
+#define NOSYSMETRICS
+#define NOTAPE
+#define NOTEXTMETRIC
+#define NOWH
+#define OEMRESOURCE
+
+#include <windows.h>
+
+#endif _FRAMEWORK_H_ // !_WINDEFINES_H_

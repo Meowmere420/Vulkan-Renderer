@@ -1,4 +1,4 @@
-// Vulkan Renderer - window.h
+// Vulkan Renderer - surface.cpp
 //
 // Copyright (c) 2020 Meowmere
 //
@@ -19,26 +19,22 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#pragma once
+#include "surface.h"
 
-#ifndef _WINDOW_H_
-#define _WINDOW_H_
-
-#include <string_view>
-
-#define GLFW_INCLUDE_VULKAN
 #include <glfw/glfw3.h>
 
-class Window
+Surface::Surface()
 {
-public:
-	Window(uint32_t width, uint32_t height, const std::string_view& name);
+    
 
-	~Window();
 
-	bool shouldClose() const noexcept;
-private:
-	GLFWwindow* _window;
-};
+}
 
-#endif // !_WINDOW_H_
+Surface::~Surface()
+{
+}
+
+VkSurfaceKHR Surface::getSurface() const noexcept
+{
+    return _surface;
+}
