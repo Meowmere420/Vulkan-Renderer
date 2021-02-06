@@ -93,14 +93,16 @@ Window::Window(uint32_t clientWidth, uint32_t clientHeight, uint32_t posX, uint3
     }
 
     _surface = new Surface(_handle, windowClass.getInstance());
+    _swapchain = new Swapchain(_surface->getSurface());
 
     ShowWindow(_handle, SW_SHOWDEFAULT);
 }
 
 Window::~Window()
 {
-    DestroyWindow(_handle);
+    delete _swapchain;
     delete _surface;
+    DestroyWindow(_handle);
 }
 
 void Window::resize(uint32_t clientWidth, uint32_t clientHeight)

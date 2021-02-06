@@ -24,27 +24,25 @@
 #ifndef _GRAPHICS_H_
 #define _GRAPHICS_H_
 
-// I fucking despise this warning, why is this shit enabled on /W3?
-#pragma warning(disable: 26812)
-
 #include "vkdefines.h"
 
 class Graphics
 {
 public:
-    Graphics();
+    static void Create();
 
-    ~Graphics();
+    static void Destroy();
 
-    static Graphics& Get() noexcept;
+    static VkInstance getVkInstance() noexcept;
 
-    VkInstance getVkInstance() const noexcept;
+    static VkDevice getVkDevice() noexcept;
 
-    VkDevice GetVkDevice() const noexcept;
+    static VkPhysicalDevice getVkPhysicalDevice(uint32_t index) noexcept;
 private:
-    static Graphics _singleton;
-    VkInstance      _instance;
-    VkDevice        _device;
+    static inline VkInstance        _instance;
+    static inline VkDevice          _device;
+    static inline VkPhysicalDevice* _physicalDevices;
+    static inline uint32_t          _physicalDeviceCount;
 };
 
 #endif // !_GRAPHICS_H_

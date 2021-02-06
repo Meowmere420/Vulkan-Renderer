@@ -60,13 +60,14 @@ public:
 
     uint32_t getHeight() const noexcept;
 private:
-    Surface*     _surface;
-    HWND         _handle;
-    HINSTANCE    _class;
-    uint32_t     _posX;
-    uint32_t     _posY;
-    uint32_t     _clientWidth;
-    uint32_t     _clientHeight;
+    Swapchain* _swapchain;
+    Surface*   _surface;
+    HWND       _handle;
+    HINSTANCE  _class;
+    uint32_t   _posX;
+    uint32_t   _posY;
+    uint32_t   _clientWidth;
+    uint32_t   _clientHeight;
 };
 
 #endif // !_WINDOW_H_

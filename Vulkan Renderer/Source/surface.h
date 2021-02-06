@@ -24,6 +24,7 @@
 #ifndef _SURFACE_H_
 #define _SURFACE_H_
 
+#include "swapchain.h"
 #include "vkdefines.h"
 #include "windefines.h"
 

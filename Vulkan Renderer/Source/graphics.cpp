@@ -23,14 +23,12 @@
 
 #include "graphics.h"
 #include "print_device_info.h"
-#include "vkassert.h"
+#include "vkdefines.h"
 #include "window.h"
 
 #pragma comment(lib, "vulkan-1.lib")
 
-Graphics Graphics::_singleton;
-
-Graphics::Graphics()
+void Graphics::Create()
 {
     VkApplicationInfo applicationInfo;
     applicationInfo.sType                      = VK_STRUCTURE_TYPE_APPLICATION_INFO;
@@ -77,19 +75,18 @@ Graphics::Graphics()
     result = vkCreateInstance(&instanceCreateInfo, nullptr, &_instance);
     CHECK_VKRESULT(result);
 
-    uint32_t physicalDeviceCount = 0;
-    result = vkEnumeratePhysicalDevices(_instance, &physicalDeviceCount, nullptr);
+    result = vkEnumeratePhysicalDevices(_instance, &_physicalDeviceCount, nullptr);
     CHECK_VKRESULT(result);
 
-    VkPhysicalDevice* physicalDevices = new VkPhysicalDevice[physicalDeviceCount];
-    result = vkEnumeratePhysicalDevices(_instance, &physicalDeviceCount, physicalDevices);
+    _physicalDevices = new VkPhysicalDevice[_physicalDeviceCount];
+    result = vkEnumeratePhysicalDevices(_instance, &_physicalDeviceCount, _physicalDevices);
     CHECK_VKRESULT(result);
 
     uint32_t queueFamilyCount = 0;
-    vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &queueFamilyCount, nullptr); // To-Do: Print device queue properties for all devices
+    vkGetPhysicalDeviceQueueFamilyProperties(_physicalDevices[0], &queueFamilyCount, nullptr); // To-Do: Print device queue properties for all devices
 
     VkQueueFamilyProperties* queueFamilyProperties = new VkQueueFamilyProperties[queueFamilyCount];
-    vkGetPhysicalDeviceQueueFamilyProperties(physicalDevices[0], &queueFamilyCount, queueFamilyProperties);
+    vkGetPhysicalDeviceQueueFamilyProperties(_physicalDevices[0], &queueFamilyCount, queueFamilyProperties);
 
     float queuePriorities[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
@@ -103,6 +100,8 @@ Graphics::Graphics()
 
     VkPhysicalDeviceFeatures enabledDeviceFeatures = {};
 
+    std::vector<const char*> deviceExtensions = { "VK_KHR_swapchain" };
+
     VkDeviceCreateInfo deviceCreateInfo;
     deviceCreateInfo.sType                     = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
     deviceCreateInfo.pNext                     = nullptr;
@@ -111,46 +110,47 @@ Graphics::Graphics()
     deviceCreateInfo.pQueueCreateInfos         = &deviceQueueCreateInfo;
     deviceCreateInfo.enabledLayerCount         = 0;
     deviceCreateInfo.ppEnabledLayerNames       = nullptr;
-    deviceCreateInfo.enabledExtensionCount     = 0;
-    deviceCreateInfo.ppEnabledExtensionNames   = nullptr;
+    deviceCreateInfo.enabledExtensionCount     = uint32_t(deviceExtensions.size());
+    deviceCreateInfo.ppEnabledExtensionNames   = deviceExtensions.data();
     deviceCreateInfo.pEnabledFeatures          = &enabledDeviceFeatures;
 
-    result = vkCreateDevice(physicalDevices[0], &deviceCreateInfo, nullptr, &_device);
+    result = vkCreateDevice(_physicalDevices[0], &deviceCreateInfo, nullptr, &_device);
     CHECK_VKRESULT(result);
 
     VkQueue queue;
     vkGetDeviceQueue(_device, 0, 0, &queue);
 
-    printPhysicalDeviceInfo(physicalDevices, physicalDeviceCount);
+    printPhysicalDeviceInfo(_physicalDevices, _physicalDeviceCount);
     printDeviceQueueFamilyProperties(queueFamilyProperties, queueFamilyCount);
     printLayerProperties(instanceLayers, layerPropertyCount);
     printExtensionProperties(instanceExtensions, extensionPropertyCount);
 
-    delete[] physicalDevices;
     delete[] queueFamilyProperties;
     delete[] instanceLayers;
     delete[] instanceExtensions;
 }
 
-Graphics::~Graphics()
+void Graphics::Destroy()
 {
     vkDeviceWaitIdle(_device);
 
     vkDestroyDevice(_device, nullptr);
     vkDestroyInstance(_instance, nullptr);
+
+    delete[] _physicalDevices;
 }
 
-Graphics& Graphics::Get() noexcept
-{
-    return _singleton;
-}
-
-VkInstance Graphics::getVkInstance() const noexcept
+VkInstance Graphics::getVkInstance() noexcept
 {
     return _instance;
 }
 
-VkDevice Graphics::GetVkDevice() const noexcept
+VkDevice Graphics::getVkDevice() noexcept
 {
     return _device;
+}
+
+VkPhysicalDevice Graphics::getVkPhysicalDevice(uint32_t index) noexcept
+{
+    return _physicalDevices[index];
 }

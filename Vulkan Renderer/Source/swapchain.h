@@ -1,4 +1,4 @@
-// Vulkan Renderer - print_device_info.h
+// Vulkan Renderer - swapchain.h
 //
 // Copyright (c) 2020 Meowmere
 //
@@ -21,21 +21,23 @@
 
 #pragma once
 
-#ifndef _PRINT_DEVICE_INFO_H_
-#define _PRINT_DEVICE_INFO_H_
-
-#include <iostream>
+#ifndef _SWAPCHAIN_H_
+#define _SWAPCHAIN_H_
 
 #include "vkdefines.h"
 
-void printPhysicalDeviceInfo(const VkPhysicalDevice* physicalDevices, const uint32_t physicalDeviceCount);
+class Swapchain
+{
+public:
+    Swapchain(VkSurfaceKHR surface);
 
-void printDeviceQueueFamilyProperties(const VkQueueFamilyProperties* deviceQueueFamilies, const uint32_t queueFamilyCount);
+    ~Swapchain();
 
-void printLayerProperties(const VkLayerProperties* instanceLayers, const uint32_t layerPropertyCount);
+    void swap() const;
+private:
+    VkSwapchainKHR _swapchain;
+    VkImageView*   _imageViews;
+    uint32_t       _imageCount;
+};
 
-void printExtensionProperties(const VkExtensionProperties* extensions, const uint32_t extensionCount);
-
-void printSurfaceCapabilities(const VkSurfaceCapabilitiesKHR& surfaceCapabilities);
-
-#endif // !_PRINT_DEVICE_INFO_H_
+#endif // !_SWAPCHAIN_H_

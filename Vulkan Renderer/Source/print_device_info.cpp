@@ -22,7 +22,7 @@
 #include <iostream>
 
 #include "print_device_info.h"
-#include "vkassert.h"
+#include "vkdefines.h"
 
 // I don't even understand why I have to disable this abomination, sometimes Visual Studio is just straight up retarded
 #pragma warning(disable: 6385)
@@ -190,6 +190,26 @@ void printExtensionProperties(const VkExtensionProperties* extensions, const uin
 
         printSingleExtensionProperty(extensions[i]);
     }
+
+    std::cout << std::endl;
+}
+
+void printSurfaceCapabilities(const VkSurfaceCapabilitiesKHR& surfaceCapabilities)
+{
+    std::cout << "==================================================" << '\n';
+    std::cout << "Surface capabilities" << '\n';
+    std::cout << "==================================================" << '\n';
+    
+    std::cout << std::endl;
+
+    std::cout << "Min image count               " << surfaceCapabilities.minImageCount << '\n';
+    std::cout << "Max image count               " << surfaceCapabilities.maxImageCount << '\n';
+    std::cout << "Current width                 " << surfaceCapabilities.currentExtent.width << '\n';
+    std::cout << "Current height                " << surfaceCapabilities.currentExtent.height << '\n';
+    std::cout << "Min image width               " << surfaceCapabilities.minImageExtent.width << '\n';
+    std::cout << "Min image height              " << surfaceCapabilities.minImageExtent.height << '\n';
+    std::cout << "Max image width               " << surfaceCapabilities.maxImageExtent.width << '\n';
+    std::cout << "Max image height              " << surfaceCapabilities.maxImageExtent.height << '\n';
 
     std::cout << std::endl;
 }

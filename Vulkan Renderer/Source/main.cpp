@@ -30,7 +30,12 @@
 
 int main()
 {
-	Window window(800, 600, 0, 0, L"Window");
+	Graphics::Create();
 
-	std::cin.get();
+	{
+		Window window(800, 600, 0, 0, L"Window");
+		std::cin.get();
+	}
+
+	Graphics::Destroy();
 }

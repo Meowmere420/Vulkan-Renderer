@@ -20,8 +20,9 @@
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 #include "graphics.h"
+#include "print_device_info.h"
 #include "surface.h"
-#include "vkassert.h"
+#include "vkdefines.h"
 #include "window.h"
 
 Surface::Surface(HWND windowHandle, HINSTANCE windowClass)
@@ -33,13 +34,27 @@ Surface::Surface(HWND windowHandle, HINSTANCE windowClass)
     surfaceCreateInfo.hinstance = windowClass;
     surfaceCreateInfo.hwnd      = windowHandle;
 
-    VkResult result = vkCreateWin32SurfaceKHR(Graphics::Get().getVkInstance(), &surfaceCreateInfo, nullptr, &_surface);
+    VkResult result = vkCreateWin32SurfaceKHR(Graphics::getVkInstance(), &surfaceCreateInfo, nullptr, &_surface);
     CHECK_VKRESULT(result);
+
+    VkSurfaceCapabilitiesKHR surfaceCapabilities;
+    result = vkGetPhysicalDeviceSurfaceCapabilitiesKHR(Graphics::getVkPhysicalDevice(0), _surface, &surfaceCapabilities);
+    CHECK_VKRESULT(result);
+
+    printSurfaceCapabilities(surfaceCapabilities);
+
+    uint32_t supportedFormatCount;
+    vkGetPhysicalDeviceSurfaceFormatsKHR(Graphics::getVkPhysicalDevice(0), _surface, &supportedFormatCount, nullptr);
+
+    VkSurfaceFormatKHR* surfaceFormats = new VkSurfaceFormatKHR[supportedFormatCount];
+    vkGetPhysicalDeviceSurfaceFormatsKHR(Graphics::getVkPhysicalDevice(0), _surface, &supportedFormatCount, surfaceFormats);
+
+    delete[] surfaceFormats;
 }
 
 Surface::~Surface()
 {
-    vkDestroySurfaceKHR(Graphics::Get().getVkInstance(), _surface, nullptr);
+    vkDestroySurfaceKHR(Graphics::getVkInstance(), _surface, nullptr);
 }
 
 VkSurfaceKHR Surface::getSurface() const noexcept

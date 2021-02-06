@@ -158,6 +158,7 @@
     <ClCompile Include="Source\graphics.cpp" />
     <ClCompile Include="Source\main.cpp" />
     <ClCompile Include="Source\print_device_info.cpp" />
+    <ClCompile Include="Source\swapchain.cpp" />
     <ClCompile Include="Source\win32_surface.cpp" />
     <ClCompile Include="Source\win32_window.cpp" />
   </ItemGroup>
@@ -165,6 +166,7 @@
     <ClInclude Include="Source\graphics.h" />
     <ClInclude Include="Source\print_device_info.h" />
     <ClInclude Include="Source\surface.h" />
+    <ClInclude Include="Source\swapchain.h" />
     <ClInclude Include="Source\vkdefines.h" />
     <ClInclude Include="Source\windefines.h" />
     <ClInclude Include="Source\window.h" />
