@@ -1,4 +1,5 @@
-// Vulkan Renderer - window.h
+// Vulkan Renderer - callback.h
+//
 // Copyright (c) 2020 Meowmere
 //
 // https://github.com/Meowmere420/Vulkan-Renderer
@@ -20,57 +21,35 @@
 
 #pragma once
 
-#ifndef _WINDOW_H_
-#define _WINDOW_H_
-
-#include "windefines.h"
+#ifndef _CALLBACK_H_
+#define _CALLBACK_H_
 
 #include <stdint.h>
 
-#include <memory>
-#include <string_view>
-#include <vector>
-
-#include "surface.h"
-
-class Window
+class Callback
 {
-    friend class WindowClass;
 public:
-    Window(uint32_t clientWidth, uint32_t clientHeight, uint32_t posX, uint32_t posY, const std::wstring_view& title);
+	Callback();
 
-    ~Window();
+	virtual ~Callback();
 
-    void resize(uint32_t clientWidth, uint32_t clientHeight);
+	virtual void onKeyPress(uint8_t keycode) {}
 
-    void setPosition(uint32_t posX, uint32_t posY);
+	virtual void onKeyRelease(uint8_t keycode) {}
 
-    void setTitle(const std::wstring_view& title);
+	virtual void onCursorMove(int32_t deltaX, int32_t deltaY) {}
 
-    void swapBuffers() const;
+	virtual void onMouseMove(int32_t deltaX, int32_t deltaY) {}
 
-    static std::vector<const char*> getVulkanExtensions();
+	virtual void onMouseScroll(int32_t delta) {}
 
-    const Surface& getSurface() const noexcept;
+	virtual void onCharType(char character) {}
 
-    uint32_t getPosX() const noexcept;
+	virtual void onSetFocus() {}
 
-    uint32_t getPosY() const noexcept;
+	virtual void onKillFocus() {}
 
-    uint32_t getWidth() const noexcept;
-
-    uint32_t getHeight() const noexcept;
-private:
-    static LRESULT WINAPI setupWinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
-private:
-    Swapchain* _swapchain;
-    Surface*   _surface;
-    HWND       _handle;
-    HINSTANCE  _class;
-    uint32_t   _posX;
-    uint32_t   _posY;
-    uint32_t   _clientWidth;
-    uint32_t   _clientHeight;
+	virtual void onExit() {}
 };
 
-#endif // !_WINDOW_H_
+#endif // !_CALLBACK_H_

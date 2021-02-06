@@ -18,6 +18,7 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
+#include "input.h"
 #include "surface.h"
 #include "window.h"
 
@@ -31,7 +32,7 @@ public:
         ZeroMemory(&wndClass, sizeof(WNDCLASSEX));
         wndClass.cbSize        = sizeof(WNDCLASSEX);
         wndClass.style         = CS_OWNDC;
-        wndClass.lpfnWndProc   = DefWindowProc;
+        wndClass.lpfnWndProc   = Window::setupWinProc;
         wndClass.cbClsExtra    = 0;
         wndClass.cbWndExtra    = 0;
         wndClass.hInstance     = _instance;
@@ -157,4 +158,17 @@ uint32_t Window::getWidth() const noexcept
 uint32_t Window::getHeight() const noexcept
 {
     return _clientHeight;
+}
+
+LRESULT WINAPI Window::setupWinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam)
+{
+    if (msg == WM_NCCREATE)
+    {
+        const CREATESTRUCTW* const create = reinterpret_cast<CREATESTRUCTW*>(lparam);
+        Window* const window = static_cast<Window*>(create->lpCreateParams);
+        SetWindowLongPtr(hwnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(window));
+        SetWindowLongPtr(hwnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(&Input::processMessage));
+        return Input::processMessage(hwnd, msg, wparam, lparam);
+    }
+    return DefWindowProc(hwnd, msg, wparam, lparam);
 }

@@ -1,4 +1,5 @@
-// Vulkan Renderer - window.h
+// Vulkan Renderer - input.h
+//
 // Copyright (c) 2020 Meowmere
 //
 // https://github.com/Meowmere420/Vulkan-Renderer
@@ -20,57 +21,37 @@
 
 #pragma once
 
-#ifndef _WINDOW_H_
-#define _WINDOW_H_
-
-#include "windefines.h"
+#ifndef _INPUT_H_
+#define _INPUT_H_
 
 #include <stdint.h>
 
-#include <memory>
-#include <string_view>
-#include <vector>
+#include <bitset>
+#include <list>
 
-#include "surface.h"
+#include "callback.h"
+#include "windefines.h"
 
-class Window
+class Input
 {
-    friend class WindowClass;
+    friend class Window;
 public:
-    Window(uint32_t clientWidth, uint32_t clientHeight, uint32_t posX, uint32_t posY, const std::wstring_view& title);
+    static void registerCallback(Callback* callback);
 
-    ~Window();
+    static void unregisterCallback(Callback* callback);
+    
+    static bool isKeyDown(uint8_t keycode) noexcept;
 
-    void resize(uint32_t clientWidth, uint32_t clientHeight);
+    static int32_t getCursorX() noexcept;
 
-    void setPosition(uint32_t posX, uint32_t posY);
-
-    void setTitle(const std::wstring_view& title);
-
-    void swapBuffers() const;
-
-    static std::vector<const char*> getVulkanExtensions();
-
-    const Surface& getSurface() const noexcept;
-
-    uint32_t getPosX() const noexcept;
-
-    uint32_t getPosY() const noexcept;
-
-    uint32_t getWidth() const noexcept;
-
-    uint32_t getHeight() const noexcept;
+    static int32_t getCursorY() noexcept;
 private:
-    static LRESULT WINAPI setupWinProc(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
+    static LRESULT CALLBACK processMessage(HWND hwnd, UINT msg, WPARAM wparam, LPARAM lparam);
 private:
-    Swapchain* _swapchain;
-    Surface*   _surface;
-    HWND       _handle;
-    HINSTANCE  _class;
-    uint32_t   _posX;
-    uint32_t   _posY;
-    uint32_t   _clientWidth;
-    uint32_t   _clientHeight;
+    static inline std::list<Callback*> _callbacks;
+    static inline std::bitset<256>     _keystates;
+    static inline int32_t              _cursorX;
+    static inline int32_t              _cursorY;
 };
 
-#endif // !_WINDOW_H_
+#endif // !_INPUT_H_

@@ -1,4 +1,4 @@
-// Vulkan Renderer - main.cpp
+// Vulkan Renderer - callback.cpp
 //
 // Copyright (c) 2020 Meowmere
 //
@@ -19,37 +19,15 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include <chrono>
-#include <thread>
-#include <iostream>
-
 #include "callback.h"
-#include "graphics.h"
 #include "input.h"
-#include "print_device_info.h"
-#include "window.h"
 
-int main()
+Callback::Callback()
 {
-	Graphics::Create();
+	Input::registerCallback(this);
+}
 
-	{
-		Window window(800, 600, 0, 0, L"Window");
-
-		while (true)
-		{
-			static MSG msg;
-			while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
-		}
-
-		std::cin.get();
-	}
-
-	Graphics::Destroy();
+Callback::~Callback()
+{
+	Input::unregisterCallback(this);
 }
