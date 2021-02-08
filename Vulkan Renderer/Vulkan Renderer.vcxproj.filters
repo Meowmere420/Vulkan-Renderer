@@ -69,4 +69,12 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="$(MSBuildProjectDirectory)\**\*.vert;$(MSBuildProjectDirectory)\**\*.frag" />
+    <CustomBuild Include="$(MSBuildProjectDirectory)\**\*.vert;$(MSBuildProjectDirectory)\**\*.frag" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Source\fragment_shader.spv" />
+    <None Include="Source\vertex_shader.spv" />
+  </ItemGroup>
 </Project>
