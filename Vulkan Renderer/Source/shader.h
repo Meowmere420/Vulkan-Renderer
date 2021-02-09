@@ -1,4 +1,4 @@
-// Vulkan Renderer - main.cpp
+// Vulkan Renderer - shader.h
 //
 // Copyright (c) 2020 Meowmere
 //
@@ -19,41 +19,23 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include <chrono>
-#include <thread>
-#include <iostream>
+#pragma once
 
-#include "callback.h"
-#include "graphics.h"
-#include "input.h"
-#include "print_device_info.h"
-#include "shader.h"
-#include "window.h"
+#ifndef _SHADER_H_
+#define _SHADER_H_
 
-int main()
+#include <string_view>
+
+#include "vkdefines.h"
+
+class Shader
 {
-	Graphics::Create();
+public:
+	Shader(const std::string_view& filePath);
 
-	{
-		Window window(800, 600, 0, 0, L"Window");
+	~Shader();
+private:
+	VkShaderModule _shaderModule;
+};
 
-		Shader vertex_shader("Source/Shaders/vertex_shader.spv");
-		Shader fragment_shader("Source/Shaders/fragment_shader.spv");
-
-		while (true)
-		{
-			static MSG msg;
-			while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
-		}
-
-		std::cin.get();
-	}
-
-	Graphics::Destroy();
-}
+#endif // !_SHADER_H_

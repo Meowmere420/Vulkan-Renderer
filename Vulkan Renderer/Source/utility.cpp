@@ -1,4 +1,4 @@
-// Vulkan Renderer - main.cpp
+// Vulkan Renderer - utility.cpp
 //
 // Copyright (c) 2020 Meowmere
 //
@@ -19,41 +19,25 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include <chrono>
-#include <thread>
-#include <iostream>
+#include <assert.h>
+#include <fstream>
 
-#include "callback.h"
-#include "graphics.h"
-#include "input.h"
-#include "print_device_info.h"
-#include "shader.h"
-#include "window.h"
+#include "utility.h"
 
-int main()
+std::vector<char> loadFile(const std::string_view& filePath)
 {
-	Graphics::Create();
-
+	std::ifstream file(filePath.data(), std::ios::binary | std::ios::ate);
+	if (!file.is_open())
 	{
-		Window window(800, 600, 0, 0, L"Window");
-
-		Shader vertex_shader("Source/Shaders/vertex_shader.spv");
-		Shader fragment_shader("Source/Shaders/fragment_shader.spv");
-
-		while (true)
-		{
-			static MSG msg;
-			while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
-		}
-
-		std::cin.get();
+		__debugbreak();
 	}
 
-	Graphics::Destroy();
+	size_t fileSize = file.tellg();
+	file.seekg(0);
+
+	std::vector<char> buffer(fileSize);
+	file.read(buffer.data(), fileSize);
+	file.close();
+
+	return buffer;
 }

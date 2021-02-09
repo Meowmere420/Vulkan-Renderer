@@ -1,4 +1,4 @@
-// Vulkan Renderer - main.cpp
+// Vulkan Renderer - shader.cpp
 //
 // Copyright (c) 2020 Meowmere
 //
@@ -19,41 +19,27 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include <chrono>
-#include <thread>
-#include <iostream>
-
-#include "callback.h"
 #include "graphics.h"
-#include "input.h"
-#include "print_device_info.h"
+#include "utility.h"
 #include "shader.h"
-#include "window.h"
 
-int main()
+#include "vkdefines.h"
+
+Shader::Shader(const std::string_view& filePath)
 {
-	Graphics::Create();
+    auto shaderCode = loadFile(filePath);
 
-	{
-		Window window(800, 600, 0, 0, L"Window");
+    VkShaderModuleCreateInfo shaderModuleCreateInfo;
+    shaderModuleCreateInfo.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
+    shaderModuleCreateInfo.pNext    = nullptr;
+    shaderModuleCreateInfo.flags    = 0;
+    shaderModuleCreateInfo.codeSize = shaderCode.size();
+    shaderModuleCreateInfo.pCode    = (uint32_t*)shaderCode.data();
 
-		Shader vertex_shader("Source/Shaders/vertex_shader.spv");
-		Shader fragment_shader("Source/Shaders/fragment_shader.spv");
+    vkCreateShaderModule(Graphics::getVkDevice(), &shaderModuleCreateInfo, nullptr, &_shaderModule);
+}
 
-		while (true)
-		{
-			static MSG msg;
-			while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
-			{
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-
-			std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
-		}
-
-		std::cin.get();
-	}
-
-	Graphics::Destroy();
+Shader::~Shader()
+{
+    vkDestroyShaderModule(Graphics::getVkDevice(), _shaderModule, nullptr);
 }
