@@ -1,4 +1,4 @@
-// Vulkan Renderer - shader.cpp
+// Vulkan Renderer - pipeline.h
 //
 // Copyright (c) 2020 Meowmere
 //
@@ -19,32 +19,21 @@
 // WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE
 // SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-#include "graphics.h"
-#include "utility.h"
+#pragma once
+
+#ifndef _PIPELINE_H_
+#define _PIPELINE_H_
+
 #include "shader.h"
 
-#include "vkdefines.h"
-
-Shader::Shader(const std::string_view& filePath)
+class Pipeline
 {
-    auto shaderCode = loadFile(filePath);
+public:
+	Pipeline(const Shader& vertexShader, const Shader& fragmentShader);
 
-    VkShaderModuleCreateInfo shaderModuleCreateInfo;
-    shaderModuleCreateInfo.sType    = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
-    shaderModuleCreateInfo.pNext    = nullptr;
-    shaderModuleCreateInfo.flags    = 0;
-    shaderModuleCreateInfo.codeSize = shaderCode.size();
-    shaderModuleCreateInfo.pCode    = (uint32_t*)shaderCode.data();
+	~Pipeline();
+private:
+	VkPipelineLayout _pipelineLayout;
+};
 
-    vkCreateShaderModule(Graphics::getVkDevice(), &shaderModuleCreateInfo, nullptr, &_shaderModule);
-}
-
-Shader::~Shader()
-{
-    vkDestroyShaderModule(Graphics::getVkDevice(), _shaderModule, nullptr);
-}
-
-VkShaderModule Shader::getModule() const noexcept
-{
-    return _shaderModule;
-}
+#endif // !_PIPELINE_H_

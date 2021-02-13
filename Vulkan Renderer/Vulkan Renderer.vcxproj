@@ -159,6 +159,7 @@
     <ClCompile Include="Source\graphics.cpp" />
     <ClCompile Include="Source\input.cpp" />
     <ClCompile Include="Source\main.cpp" />
+    <ClCompile Include="Source\pipeline.cpp" />
     <ClCompile Include="Source\print_device_info.cpp" />
     <ClCompile Include="Source\swapchain.cpp" />
     <ClCompile Include="Source\utility.cpp" />
@@ -170,6 +171,7 @@
     <ClInclude Include="Source\callback.h" />
     <ClInclude Include="Source\graphics.h" />
     <ClInclude Include="Source\input.h" />
+    <ClInclude Include="Source\pipeline.h" />
     <ClInclude Include="Source\print_device_info.h" />
     <ClInclude Include="Source\surface.h" />
     <ClInclude Include="Source\swapchain.h" />

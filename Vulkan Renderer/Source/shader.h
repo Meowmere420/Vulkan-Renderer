@@ -31,11 +31,13 @@
 class Shader
 {
 public:
-	Shader(const std::string_view& filePath);
+    Shader(const std::string_view& filePath);
 
-	~Shader();
+    ~Shader();
+
+    VkShaderModule getModule() const noexcept;
 private:
-	VkShaderModule _shaderModule;
+    VkShaderModule _shaderModule;
 };
 
 #endif // !_SHADER_H_

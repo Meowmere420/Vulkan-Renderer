@@ -26,6 +26,7 @@
 #include "callback.h"
 #include "graphics.h"
 #include "input.h"
+#include "pipeline.h"
 #include "print_device_info.h"
 #include "shader.h"
 #include "window.h"
@@ -39,6 +40,8 @@ int main()
 
 		Shader vertex_shader("Source/Shaders/vertex_shader.spv");
 		Shader fragment_shader("Source/Shaders/fragment_shader.spv");
+
+		Pipeline pipeline(vertex_shader, fragment_shader);
 
 		while (true)
 		{
