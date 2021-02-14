@@ -29,11 +29,13 @@
 class Pipeline
 {
 public:
-	Pipeline(const Shader& vertexShader, const Shader& fragmentShader);
+    Pipeline(const Shader& vertexShader, const Shader& fragmentShader);
 
-	~Pipeline();
+    ~Pipeline();
 private:
-	VkPipelineLayout _pipelineLayout;
+    VkPipelineLayout _pipelineLayout;
+    VkRenderPass     _renderPass;
+    VkPipeline       _pipeline;
 };
 
 #endif // !_PIPELINE_H_

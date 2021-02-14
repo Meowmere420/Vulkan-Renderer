@@ -89,12 +89,6 @@
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="D:\Documents\Github\Vulkan Renderer\Vulkan Renderer\Source\shaders\fragment_shader.frag" />
-    <CustomBuild Include="D:\Documents\Github\Vulkan Renderer\Vulkan Renderer\Source\vertex_shader.vert" />
-    <CustomBuild Include="D:\Documents\Github\Vulkan Renderer\Vulkan Renderer\Source\fragment_shader.frag" />
-    <CustomBuild Include="D:\Documents\Github\Vulkan Renderer\Vulkan Renderer\Source\shaders\fragment_shader.frag" />
-    <CustomBuild Include="D:\Documents\Github\Vulkan Renderer\Vulkan Renderer\Source\vertex_shader.vert" />
-    <CustomBuild Include="D:\Documents\Github\Vulkan Renderer\Vulkan Renderer\Source\fragment_shader.frag" />
-    <CustomBuild Include="D:\Documents\Github\Vulkan Renderer\Vulkan Renderer\Source\shaders\fragment_shader.frag" />
     <CustomBuild Include="$(MSBuildProjectDirectory)\**\*.vert" />
     <CustomBuild Include="$(MSBuildProjectDirectory)\**\*.frag" />
   </ItemGroup>

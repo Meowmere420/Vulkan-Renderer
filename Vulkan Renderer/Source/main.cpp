@@ -48,15 +48,18 @@ int main()
 			static MSG msg;
 			while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
 			{
+				if (msg.message == WM_QUIT)
+				{
+					goto end;
+				}
 				TranslateMessage(&msg);
 				DispatchMessage(&msg);
 			}
 
-			std::this_thread::sleep_for(std::chrono::milliseconds(1)); 
+			std::this_thread::sleep_for(std::chrono::milliseconds(1));
 		}
-
-		std::cin.get();
 	}
-
+end:
+	std::cin.get();
 	Graphics::Destroy();
 }

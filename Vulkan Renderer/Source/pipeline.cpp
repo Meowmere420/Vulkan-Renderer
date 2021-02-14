@@ -37,13 +37,13 @@ Pipeline::Pipeline(const Shader& vertexShader, const Shader& fragmentShader)
     vertexStateCreateInfo.pSpecializationInfo = nullptr;
 
     VkPipelineShaderStageCreateInfo& fragmentStateCreateInfo = shaderStages[1];
-    vertexStateCreateInfo.sType               = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-    vertexStateCreateInfo.pNext               = nullptr;
-    vertexStateCreateInfo.flags               = 0;
-    vertexStateCreateInfo.stage               = VK_SHADER_STAGE_FRAGMENT_BIT;
-    vertexStateCreateInfo.module              = fragmentShader.getModule();
-    vertexStateCreateInfo.pName               = "main";
-    vertexStateCreateInfo.pSpecializationInfo = nullptr;
+    fragmentStateCreateInfo.sType               = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
+    fragmentStateCreateInfo.pNext               = nullptr;
+    fragmentStateCreateInfo.flags               = 0;
+    fragmentStateCreateInfo.stage               = VK_SHADER_STAGE_FRAGMENT_BIT;
+    fragmentStateCreateInfo.module              = fragmentShader.getModule();
+    fragmentStateCreateInfo.pName               = "main";
+    fragmentStateCreateInfo.pSpecializationInfo = nullptr;
     
     VkPipelineVertexInputStateCreateInfo vertexInputCreateInfo;
     vertexInputCreateInfo.sType                           = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO;
@@ -144,9 +144,76 @@ Pipeline::Pipeline(const Shader& vertexShader, const Shader& fragmentShader)
 
     VkResult result = vkCreatePipelineLayout(Graphics::getVkDevice(), &pipelineLayoutCreateInfo, nullptr, &_pipelineLayout);
     CHECK_VKRESULT(result);
+
+    VkAttachmentDescription attachmentDescription;
+    attachmentDescription.flags          = 0;
+    attachmentDescription.format         = VK_FORMAT_B8G8R8A8_UNORM;
+    attachmentDescription.samples        = VK_SAMPLE_COUNT_32_BIT;
+    attachmentDescription.loadOp         = VK_ATTACHMENT_LOAD_OP_CLEAR;
+    attachmentDescription.storeOp        = VK_ATTACHMENT_STORE_OP_STORE;
+    attachmentDescription.stencilLoadOp  = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+    attachmentDescription.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+    attachmentDescription.initialLayout  = VK_IMAGE_LAYOUT_UNDEFINED;
+    attachmentDescription.finalLayout    = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+
+    VkAttachmentReference attachmentReference;
+    attachmentReference.attachment = 0;
+    attachmentReference.layout     = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+
+    VkSubpassDescription subpassDescription;
+    subpassDescription.flags                   = 0;
+    subpassDescription.pipelineBindPoint       = VK_PIPELINE_BIND_POINT_GRAPHICS;
+    subpassDescription.inputAttachmentCount    = 0;
+    subpassDescription.pInputAttachments       = nullptr;
+    subpassDescription.colorAttachmentCount    = 1;
+    subpassDescription.pColorAttachments       = &attachmentReference;
+    subpassDescription.pResolveAttachments     = nullptr;
+    subpassDescription.pDepthStencilAttachment = nullptr;
+    subpassDescription.preserveAttachmentCount = 0;
+    subpassDescription.pPreserveAttachments    = nullptr;
+
+    VkRenderPassCreateInfo renderPassCreateInfo;
+    renderPassCreateInfo.sType           = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
+    renderPassCreateInfo.pNext           = nullptr;
+    renderPassCreateInfo.flags           = 0;
+    renderPassCreateInfo.attachmentCount = 1;
+    renderPassCreateInfo.pAttachments    = &attachmentDescription;
+    renderPassCreateInfo.subpassCount    = 1;
+    renderPassCreateInfo.pSubpasses      = &subpassDescription;
+    renderPassCreateInfo.dependencyCount = 0;
+    renderPassCreateInfo.pDependencies   = nullptr;
+
+    result = vkCreateRenderPass(Graphics::getVkDevice(), &renderPassCreateInfo, nullptr, &_renderPass);
+    CHECK_VKRESULT(result);
+
+    VkGraphicsPipelineCreateInfo pipelineCreateInfo;
+    pipelineCreateInfo.sType               = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO;
+    pipelineCreateInfo.pNext               = nullptr;
+    pipelineCreateInfo.flags               = 0;
+    pipelineCreateInfo.stageCount          = 2;
+    pipelineCreateInfo.pStages             = shaderStages;
+    pipelineCreateInfo.pVertexInputState   = &vertexInputCreateInfo;
+    pipelineCreateInfo.pInputAssemblyState = &inputAssemblyCreateInfo;
+    pipelineCreateInfo.pTessellationState  = nullptr;
+    pipelineCreateInfo.pViewportState      = &viewportStateCreateInfo;
+    pipelineCreateInfo.pRasterizationState = &rasterizationStateCreateInfo;
+    pipelineCreateInfo.pMultisampleState   = &multisampleStateCreateInfo;
+    pipelineCreateInfo.pDepthStencilState  = nullptr;
+    pipelineCreateInfo.pColorBlendState    = &colorBlendStateCreateInfo;
+    pipelineCreateInfo.pDynamicState       = nullptr;
+    pipelineCreateInfo.layout              = _pipelineLayout;
+    pipelineCreateInfo.renderPass          = _renderPass;
+    pipelineCreateInfo.subpass             = 0;
+    pipelineCreateInfo.basePipelineHandle  = VK_NULL_HANDLE;
+    pipelineCreateInfo.basePipelineIndex   = -1;
+
+    result = vkCreateGraphicsPipelines(Graphics::getVkDevice(), VK_NULL_HANDLE, 1, &pipelineCreateInfo, nullptr, &_pipeline);
+    CHECK_VKRESULT(result);
 }
 
 Pipeline::~Pipeline()
 {
+    vkDestroyPipeline(Graphics::getVkDevice(), _pipeline, nullptr);
     vkDestroyPipelineLayout(Graphics::getVkDevice(), _pipelineLayout, nullptr);
+    vkDestroyRenderPass(Graphics::getVkDevice(), _renderPass, nullptr);
 }
