@@ -548,12 +548,13 @@ void destroyGraphics()
     vkDestroyShaderModule(device, vertexShader, nullptr);
     vkDestroyShaderModule(device, fragmentShader, nullptr);
 
-    vkDestroySurfaceKHR(instance, surface, nullptr);
-
-    for (uint32_t i = 0; i < imageViewCount; i++)
-        vkDestroyImageView(device, imageViews[i], nullptr);
-
     vkDestroySwapchainKHR(device, swapchain, nullptr);
+    vkDestroySurfaceKHR(instance, surface, nullptr);
+    
+    for (uint32_t i = 0; i < imageViewCount; i++)
+    {
+        vkDestroyImageView(device, imageViews[i], nullptr);
+    }
 
     vkDeviceWaitIdle(device);
 
@@ -584,6 +585,7 @@ int main()
             if (msg.message == WM_QUIT)
             {
                 running = false;
+                destroyGraphics();
             }
             TranslateMessage(&msg);
             DispatchMessage(&msg);
@@ -592,6 +594,5 @@ int main()
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
-    destroyGraphics();
     std::cin.get();
 }
