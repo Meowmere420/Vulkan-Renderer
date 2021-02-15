@@ -155,31 +155,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source\callback.cpp" />
-    <ClCompile Include="Source\graphics.cpp" />
-    <ClCompile Include="Source\input.cpp" />
     <ClCompile Include="Source\main.cpp" />
-    <ClCompile Include="Source\pipeline.cpp" />
     <ClCompile Include="Source\print_device_info.cpp" />
-    <ClCompile Include="Source\swapchain.cpp" />
     <ClCompile Include="Source\utility.cpp" />
-    <ClCompile Include="Source\shader.cpp" />
-    <ClCompile Include="Source\win32_surface.cpp" />
-    <ClCompile Include="Source\win32_window.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\callback.h" />
-    <ClInclude Include="Source\graphics.h" />
-    <ClInclude Include="Source\input.h" />
-    <ClInclude Include="Source\pipeline.h" />
     <ClInclude Include="Source\print_device_info.h" />
-    <ClInclude Include="Source\surface.h" />
-    <ClInclude Include="Source\swapchain.h" />
     <ClInclude Include="Source\utility.h" />
-    <ClInclude Include="Source\shader.h" />
     <ClInclude Include="Source\vkdefines.h" />
     <ClInclude Include="Source\windefines.h" />
-    <ClInclude Include="Source\window.h" />
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="$(MSBuildProjectDirectory)\**\*.vert">
