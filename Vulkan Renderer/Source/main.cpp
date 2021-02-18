@@ -34,27 +34,28 @@
 constexpr uint32_t windowWidth = 800;
 constexpr uint32_t windowHeight = 600;
 
-VkInstance         instance;
-uint32_t           physicalDeviceCount;
-VkPhysicalDevice*  physicalDevices;
-VkDevice           device;
+VkInstance        instance;
+uint32_t          physicalDeviceCount;
+VkPhysicalDevice* physicalDevices;
+VkDevice          device;
 
-HINSTANCE          windowClass;
-HWND               windowHandle;
-const TCHAR*       windowClassName = TEXT("Vulkan Renderer Window");
-const TCHAR*       windowTitle = TEXT("Vulkan Renderer Window");
+HINSTANCE         windowClass;
+HWND              windowHandle;
+const TCHAR*      windowClassName = TEXT("Vulkan Renderer Window");
+const TCHAR*      windowTitle = TEXT("Vulkan Renderer Window");
 
-VkSurfaceKHR       surface;
-VkSwapchainKHR     swapchain;
-uint32_t           imageViewCount;
-VkImageView*       imageViews;
+VkSurfaceKHR      surface;
+VkSwapchainKHR    swapchain;
+uint32_t          imageViewCount;
+VkImageView*      imageViews;
+VkFramebuffer*    framebuffers;
 
-VkShaderModule     vertexShader;
-VkShaderModule     fragmentShader;
+VkShaderModule    vertexShader;
+VkShaderModule    fragmentShader;
 
-VkPipelineLayout   pipelineLayout;
-VkPipeline         pipeline;
-VkRenderPass       renderPass;
+VkPipelineLayout  pipelineLayout;
+VkPipeline        pipeline;
+VkRenderPass      renderPass;
 
 void createGraphics()
 {
@@ -265,7 +266,7 @@ void createSwapchain()
     result = vkGetPhysicalDeviceSurfaceSupportKHR(physicalDevices[0], 0, surface, &surfaceSupport);
     CHECK_VKRESULT(result);
 
-    VkExtent2D imageExtent = { 800, 600 };
+    VkExtent2D imageExtent = { windowWidth, windowHeight };
 
     VkSwapchainCreateInfoKHR swapchainCreateInfo;
     swapchainCreateInfo.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR;
@@ -392,16 +393,16 @@ void createPipeline()
     VkViewport viewport;
     viewport.x = 0.0f;
     viewport.y = 0.0f;
-    viewport.width = 800.0f;
-    viewport.height = 600.0f;
+    viewport.width = static_cast<float>(windowWidth);
+    viewport.height = static_cast<float>(windowHeight);
     viewport.minDepth = 0.0f;
     viewport.maxDepth = 1.0f;
 
     VkRect2D scissor;
     scissor.offset.x = 0;
     scissor.offset.y = 0;
-    scissor.extent.width = 800;
-    scissor.extent.height = 600;
+    scissor.extent.width = windowWidth;
+    scissor.extent.height = windowHeight;
 
     VkPipelineViewportStateCreateInfo viewportStateCreateInfo;
     viewportStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO;
@@ -431,7 +432,7 @@ void createPipeline()
     multisampleStateCreateInfo.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO;
     multisampleStateCreateInfo.pNext = nullptr;
     multisampleStateCreateInfo.flags = 0;
-    multisampleStateCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_32_BIT;
+    multisampleStateCreateInfo.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT;
     multisampleStateCreateInfo.sampleShadingEnable = VK_FALSE;
     multisampleStateCreateInfo.minSampleShading = 1.0f;
     multisampleStateCreateInfo.pSampleMask = nullptr;
@@ -476,7 +477,7 @@ void createPipeline()
     VkAttachmentDescription attachmentDescription;
     attachmentDescription.flags = 0;
     attachmentDescription.format = VK_FORMAT_B8G8R8A8_UNORM;
-    attachmentDescription.samples = VK_SAMPLE_COUNT_32_BIT;
+    attachmentDescription.samples = VK_SAMPLE_COUNT_1_BIT;
     attachmentDescription.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
     attachmentDescription.storeOp = VK_ATTACHMENT_STORE_OP_STORE;
     attachmentDescription.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
@@ -539,8 +540,37 @@ void createPipeline()
     CHECK_VKRESULT(result);
 }
 
+void createFramebuffers()
+{
+    framebuffers = new VkFramebuffer[imageViewCount];
+
+    for (uint32_t i = 0; i < imageViewCount; i++)
+    {
+        VkFramebufferCreateInfo framebufferCreateInfo;
+        framebufferCreateInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
+        framebufferCreateInfo.pNext = nullptr;
+        framebufferCreateInfo.flags = 0;
+        framebufferCreateInfo.renderPass = renderPass;
+        framebufferCreateInfo.attachmentCount = 1;
+        framebufferCreateInfo.pAttachments = imageViews;
+        framebufferCreateInfo.width = windowWidth;
+        framebufferCreateInfo.height = windowHeight;
+        framebufferCreateInfo.layers = 1;
+
+        VkResult result = vkCreateFramebuffer(device, &framebufferCreateInfo, nullptr, &framebuffers[i]);
+        CHECK_VKRESULT(result);
+    }
+}
+
 void destroyGraphics()
 {
+    vkDeviceWaitIdle(device);
+    
+    for (uint32_t i = 0; i < imageViewCount; i++)
+    {
+        vkDestroyFramebuffer(device, framebuffers[i], nullptr);
+    }
+
     vkDestroyPipeline(device, pipeline, nullptr);
     vkDestroyPipelineLayout(device, pipelineLayout, nullptr);
     vkDestroyRenderPass(device, renderPass, nullptr);
@@ -556,14 +586,13 @@ void destroyGraphics()
         vkDestroyImageView(device, imageViews[i], nullptr);
     }
 
-    vkDeviceWaitIdle(device);
-
     vkDestroyDevice(device, nullptr);
     vkDestroyInstance(instance, nullptr);
 
     DestroyWindow(windowHandle);
     UnregisterClass(windowClassName, windowClass);
 
+    delete[] framebuffers;
     delete[] imageViews;
     delete[] physicalDevices;
 }
@@ -576,6 +605,7 @@ int main()
     createSwapchain();
     createShaders();
     createPipeline();
+    createFramebuffers();
 
     while (bool running = true)
     {
@@ -584,8 +614,8 @@ int main()
         {
             if (msg.message == WM_QUIT)
             {
-                running = false;
                 destroyGraphics();
+                running = false;
             }
             TranslateMessage(&msg);
             DispatchMessage(&msg);
