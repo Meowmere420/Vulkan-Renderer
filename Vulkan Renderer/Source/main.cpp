@@ -57,6 +57,9 @@ VkPipelineLayout  pipelineLayout;
 VkPipeline        pipeline;
 VkRenderPass      renderPass;
 
+VkCommandPool     commandPool;
+VkCommandBuffer*  commandBuffers;
+
 void createGraphics()
 {
     VkApplicationInfo applicationInfo;
@@ -562,10 +565,39 @@ void createFramebuffers()
     }
 }
 
+void createCommandPool()
+{
+    VkCommandPoolCreateInfo commandPoolCreateInfo;
+    commandPoolCreateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
+    commandPoolCreateInfo.pNext = nullptr;
+    commandPoolCreateInfo.flags = 0;
+    commandPoolCreateInfo.queueFamilyIndex = 0; // To-Do: Choose optimal queue index
+
+    VkResult result = vkCreateCommandPool(device, &commandPoolCreateInfo, nullptr, &commandPool);
+    CHECK_VKRESULT(result);
+}
+
+void createCommandBuffers()
+{
+    commandBuffers = new VkCommandBuffer[imageViewCount];
+
+    VkCommandBufferAllocateInfo commandBufferAllocateInfo;
+    commandBufferAllocateInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
+    commandBufferAllocateInfo.pNext = nullptr;
+    commandBufferAllocateInfo.commandPool = commandPool;
+    commandBufferAllocateInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
+    commandBufferAllocateInfo.commandBufferCount = imageViewCount;
+
+    vkAllocateCommandBuffers(device, &commandBufferAllocateInfo, commandBuffers);
+}
+
 void destroyGraphics()
 {
     vkDeviceWaitIdle(device);
-    
+ 
+    vkFreeCommandBuffers(device, commandPool, imageViewCount, commandBuffers);
+    vkDestroyCommandPool(device, commandPool, nullptr);
+
     for (uint32_t i = 0; i < imageViewCount; i++)
     {
         vkDestroyFramebuffer(device, framebuffers[i], nullptr);
@@ -592,6 +624,7 @@ void destroyGraphics()
     DestroyWindow(windowHandle);
     UnregisterClass(windowClassName, windowClass);
 
+    delete[] commandBuffers;
     delete[] framebuffers;
     delete[] imageViews;
     delete[] physicalDevices;
@@ -606,6 +639,8 @@ int main()
     createShaders();
     createPipeline();
     createFramebuffers();
+    createCommandPool();
+    createCommandBuffers();
 
     while (bool running = true)
     {
