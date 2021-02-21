@@ -60,6 +60,9 @@ VkRenderPass      renderPass;
 VkCommandPool     commandPool;
 VkCommandBuffer*  commandBuffers;
 
+VkSemaphore       imageAvailable;
+VkSemaphore       renderingComplete;
+
 void createGraphics()
 {
     VkApplicationInfo applicationInfo;
@@ -591,9 +594,62 @@ void createCommandBuffers()
     vkAllocateCommandBuffers(device, &commandBufferAllocateInfo, commandBuffers);
 }
 
+void recordCommandBuffers()
+{
+    VkCommandBufferBeginInfo commandBufferBeginInfo;
+    commandBufferBeginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
+    commandBufferBeginInfo.pNext = nullptr;
+    commandBufferBeginInfo.flags = VK_COMMAND_BUFFER_USAGE_SIMULTANEOUS_USE_BIT;
+    commandBufferBeginInfo.pInheritanceInfo = nullptr;
+
+    for (uint32_t i = 0; i < imageViewCount; i++)
+    {
+        VkResult result = vkBeginCommandBuffer(commandBuffers[i], &commandBufferBeginInfo);
+        CHECK_VKRESULT(result);
+
+        VkClearValue clearValue = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+        VkRenderPassBeginInfo renderPassBeginInfo;
+        renderPassBeginInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
+        renderPassBeginInfo.pNext = nullptr;
+        renderPassBeginInfo.renderPass = renderPass;
+        renderPassBeginInfo.framebuffer = framebuffers[i];
+        renderPassBeginInfo.renderArea = { 0, 0, windowWidth, windowHeight };
+        renderPassBeginInfo.clearValueCount = 1;
+        renderPassBeginInfo.pClearValues = &clearValue;
+
+        vkCmdBeginRenderPass(commandBuffers[i], &renderPassBeginInfo, VK_SUBPASS_CONTENTS_INLINE);
+
+        vkCmdBindPipeline(commandBuffers[i], VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline);
+        vkCmdDraw(commandBuffers[i], 3, 1, 0, 0);
+
+        vkCmdEndRenderPass(commandBuffers[i]);
+
+        result = vkEndCommandBuffer(commandBuffers[i]);
+        CHECK_VKRESULT(result);
+    }
+}
+
+void createSemaphores()
+{
+    VkSemaphoreCreateInfo semaphoreCreateInfo;
+    semaphoreCreateInfo.sType = VK_STRUCTURE_TYPE_SEMAPHORE_CREATE_INFO;
+    semaphoreCreateInfo.pNext = nullptr;
+    semaphoreCreateInfo.flags = 0;
+
+    VkResult result = vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &imageAvailable);
+    CHECK_VKRESULT(result);
+    
+    result = vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &renderingComplete);
+    CHECK_VKRESULT(result);
+}
+
 void destroyGraphics()
 {
     vkDeviceWaitIdle(device);
+
+    vkDestroySemaphore(device, imageAvailable, nullptr);
+    vkDestroySemaphore(device, renderingComplete, nullptr);
  
     vkFreeCommandBuffers(device, commandPool, imageViewCount, commandBuffers);
     vkDestroyCommandPool(device, commandPool, nullptr);
@@ -641,6 +697,8 @@ int main()
     createFramebuffers();
     createCommandPool();
     createCommandBuffers();
+    recordCommandBuffers();
+    createSemaphores();
 
     while (bool running = true)
     {
@@ -655,8 +713,6 @@ int main()
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
-
-        std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 
     std::cin.get();
