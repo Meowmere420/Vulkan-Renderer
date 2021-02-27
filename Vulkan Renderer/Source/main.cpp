@@ -703,6 +703,8 @@ void destroyWindow()
 
 void draw()
 {
+    vkDeviceWaitIdle(device);
+
     uint32_t imageIndex = 0;
     VkResult result = vkAcquireNextImageKHR(device, swapchain, std::numeric_limits<uint64_t>::max(), imageAvailable, VK_NULL_HANDLE, &imageIndex);
     CHECK_VKRESULT(result);
