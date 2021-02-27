@@ -21,47 +21,49 @@
 
 #include <chrono>
 #include <iostream>
+#include <limits>
 #include <thread>
 #include <vector>
 
+#include "windefines.h"
 #include "print_device_info.h"
 #include "utility.h"
 #include "vkdefines.h"
-#include "windefines.h"
 
 #pragma comment(lib, "vulkan-1.lib")
 
 constexpr uint32_t windowWidth = 800;
 constexpr uint32_t windowHeight = 600;
 
-VkInstance        instance;
-uint32_t          physicalDeviceCount;
-VkPhysicalDevice* physicalDevices;
-VkDevice          device;
-
-HINSTANCE         windowClass;
-HWND              windowHandle;
-const TCHAR*      windowClassName = TEXT("Vulkan Renderer Window");
-const TCHAR*      windowTitle = TEXT("Vulkan Renderer Window");
-
-VkSurfaceKHR      surface;
-VkSwapchainKHR    swapchain;
-uint32_t          imageViewCount;
-VkImageView*      imageViews;
-VkFramebuffer*    framebuffers;
-
-VkShaderModule    vertexShader;
-VkShaderModule    fragmentShader;
-
-VkPipelineLayout  pipelineLayout;
-VkPipeline        pipeline;
-VkRenderPass      renderPass;
-
-VkCommandPool     commandPool;
-VkCommandBuffer*  commandBuffers;
-
-VkSemaphore       imageAvailable;
-VkSemaphore       renderingComplete;
+VkInstance         instance;
+uint32_t           physicalDeviceCount;
+VkPhysicalDevice*  physicalDevices;
+VkDevice           device;
+VkQueue            queue;
+                   
+HINSTANCE          windowClass;
+HWND               windowHandle;
+const TCHAR*       windowClassName = TEXT("Vulkan Renderer Window");
+const TCHAR*       windowTitle = TEXT("Vulkan Renderer Window");
+                   
+VkSurfaceKHR       surface;
+VkSwapchainKHR     swapchain;
+uint32_t           imageViewCount;
+VkImageView*       imageViews;
+VkFramebuffer*     framebuffers;
+                   
+VkShaderModule     vertexShader;
+VkShaderModule     fragmentShader;
+                   
+VkPipelineLayout   pipelineLayout;
+VkPipeline         pipeline;
+VkRenderPass       renderPass;
+                   
+VkCommandPool      commandPool;
+VkCommandBuffer*   commandBuffers;
+                   
+VkSemaphore        imageAvailable;
+VkSemaphore        renderingComplete;
 
 void createGraphics()
 {
@@ -83,9 +85,9 @@ void createGraphics()
     CHECK_VKRESULT(result);
 
     std::vector<const char*> enabledLayerNames;
-    #ifdef _DEBUG
+#ifdef _DEBUG
     enabledLayerNames.push_back("VK_LAYER_KHRONOS_validation");
-    #endif
+#endif
 
     std::vector<const char*> enabledExtensionNames;
     enabledExtensionNames.push_back("VK_KHR_surface");
@@ -154,7 +156,6 @@ void createGraphics()
     result = vkCreateDevice(physicalDevices[0], &deviceCreateInfo, nullptr, &device);
     CHECK_VKRESULT(result);
 
-    VkQueue queue;
     vkGetDeviceQueue(device, 0, 0, &queue);
 
     printPhysicalDeviceInfo(physicalDevices, physicalDeviceCount);
@@ -250,10 +251,12 @@ void createSurface()
     printSurfaceCapabilities(surfaceCapabilities);
 
     uint32_t supportedFormatCount;
-    vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevices[0], surface, &supportedFormatCount, nullptr);
+    result = vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevices[0], surface, &supportedFormatCount, nullptr);
+    CHECK_VKRESULT(result);
 
     VkSurfaceFormatKHR* surfaceFormats = new VkSurfaceFormatKHR[supportedFormatCount];
-    vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevices[0], surface, &supportedFormatCount, surfaceFormats);
+    result = vkGetPhysicalDeviceSurfaceFormatsKHR(physicalDevices[0], surface, &supportedFormatCount, surfaceFormats);
+    CHECK_VKRESULT(result);
 
     delete[] surfaceFormats;
 }
@@ -427,7 +430,7 @@ void createPipeline()
     rasterizationStateCreateInfo.rasterizerDiscardEnable = VK_FALSE;
     rasterizationStateCreateInfo.polygonMode = VK_POLYGON_MODE_FILL;
     rasterizationStateCreateInfo.cullMode = VK_CULL_MODE_BACK_BIT;
-    rasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_CLOCKWISE;
+    rasterizationStateCreateInfo.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE;
     rasterizationStateCreateInfo.depthBiasEnable = VK_FALSE;
     rasterizationStateCreateInfo.depthBiasConstantFactor = 0.0f;
     rasterizationStateCreateInfo.depthBiasClamp = 0.0f;
@@ -507,6 +510,15 @@ void createPipeline()
     subpassDescription.preserveAttachmentCount = 0;
     subpassDescription.pPreserveAttachments = nullptr;
 
+    VkSubpassDependency subpassDependency;
+    subpassDependency.srcSubpass = VK_SUBPASS_EXTERNAL;
+    subpassDependency.dstSubpass = 0;
+    subpassDependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    subpassDependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+    subpassDependency.srcAccessMask = 0;
+    subpassDependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_READ_BIT | VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+    subpassDependency.dependencyFlags = 0;
+
     VkRenderPassCreateInfo renderPassCreateInfo;
     renderPassCreateInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
     renderPassCreateInfo.pNext = nullptr;
@@ -515,8 +527,8 @@ void createPipeline()
     renderPassCreateInfo.pAttachments = &attachmentDescription;
     renderPassCreateInfo.subpassCount = 1;
     renderPassCreateInfo.pSubpasses = &subpassDescription;
-    renderPassCreateInfo.dependencyCount = 0;
-    renderPassCreateInfo.pDependencies = nullptr;
+    renderPassCreateInfo.dependencyCount = 1;
+    renderPassCreateInfo.pDependencies = &subpassDependency;
 
     result = vkCreateRenderPass(device, &renderPassCreateInfo, nullptr, &renderPass);
     CHECK_VKRESULT(result);
@@ -558,7 +570,7 @@ void createFramebuffers()
         framebufferCreateInfo.flags = 0;
         framebufferCreateInfo.renderPass = renderPass;
         framebufferCreateInfo.attachmentCount = 1;
-        framebufferCreateInfo.pAttachments = imageViews;
+        framebufferCreateInfo.pAttachments = &imageViews[i];
         framebufferCreateInfo.width = windowWidth;
         framebufferCreateInfo.height = windowHeight;
         framebufferCreateInfo.layers = 1;
@@ -639,7 +651,7 @@ void createSemaphores()
 
     VkResult result = vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &imageAvailable);
     CHECK_VKRESULT(result);
-    
+
     result = vkCreateSemaphore(device, &semaphoreCreateInfo, nullptr, &renderingComplete);
     CHECK_VKRESULT(result);
 }
@@ -650,7 +662,7 @@ void destroyGraphics()
 
     vkDestroySemaphore(device, imageAvailable, nullptr);
     vkDestroySemaphore(device, renderingComplete, nullptr);
- 
+
     vkFreeCommandBuffers(device, commandPool, imageViewCount, commandBuffers);
     vkDestroyCommandPool(device, commandPool, nullptr);
 
@@ -668,7 +680,7 @@ void destroyGraphics()
 
     vkDestroySwapchainKHR(device, swapchain, nullptr);
     vkDestroySurfaceKHR(instance, surface, nullptr);
-    
+
     for (uint32_t i = 0; i < imageViewCount; i++)
     {
         vkDestroyImageView(device, imageViews[i], nullptr);
@@ -677,19 +689,58 @@ void destroyGraphics()
     vkDestroyDevice(device, nullptr);
     vkDestroyInstance(instance, nullptr);
 
-    DestroyWindow(windowHandle);
-    UnregisterClass(windowClassName, windowClass);
-
     delete[] commandBuffers;
     delete[] framebuffers;
     delete[] imageViews;
     delete[] physicalDevices;
 }
 
+void destroyWindow()
+{
+    DestroyWindow(windowHandle);
+    UnregisterClass(windowClassName, windowClass);
+}
+
+void draw()
+{
+    uint32_t imageIndex = 0;
+    VkResult result = vkAcquireNextImageKHR(device, swapchain, std::numeric_limits<uint64_t>::max(), imageAvailable, VK_NULL_HANDLE, &imageIndex);
+    CHECK_VKRESULT(result);
+
+    VkPipelineStageFlags pipelineStageFlags[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+
+    VkSubmitInfo submitInfo;
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
+    submitInfo.pNext = nullptr;
+    submitInfo.waitSemaphoreCount = 1;
+    submitInfo.pWaitSemaphores = &imageAvailable;
+    submitInfo.pWaitDstStageMask = pipelineStageFlags;
+    submitInfo.commandBufferCount = 1;
+    submitInfo.pCommandBuffers = &commandBuffers[imageIndex];
+    submitInfo.signalSemaphoreCount = 1;
+    submitInfo.pSignalSemaphores = &renderingComplete;
+
+    result = vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE);
+    CHECK_VKRESULT(result);
+
+    VkPresentInfoKHR presentInfo;
+    presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
+    presentInfo.pNext = nullptr;
+    presentInfo.waitSemaphoreCount = 1;
+    presentInfo.pWaitSemaphores = &renderingComplete;
+    presentInfo.swapchainCount = 1;
+    presentInfo.pSwapchains = &swapchain;
+    presentInfo.pImageIndices = &imageIndex;
+    presentInfo.pResults = nullptr;
+
+    result = vkQueuePresentKHR(queue, &presentInfo);
+    CHECK_VKRESULT(result);
+}
+
 int main()
 {
-    createGraphics();
     createWindow();
+    createGraphics();
     createSurface();
     createSwapchain();
     createShaders();
@@ -700,20 +751,25 @@ int main()
     recordCommandBuffers();
     createSemaphores();
 
-    while (bool running = true)
+    bool running = true;
+    while (running)
     {
         static MSG msg;
         while (PeekMessage(&msg, nullptr, 0, 0, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)
             {
-                destroyGraphics();
                 running = false;
             }
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
+
+        draw();
     }
+
+    destroyGraphics();
+    destroyWindow();
 
     std::cin.get();
 }
